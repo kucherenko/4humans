@@ -5,13 +5,14 @@ import { RunnableSequence } from '@langchain/core/runnables'
 import { Agent } from './Agent'
 import { testAgentPrompt } from './prompts'
 import { TestAgentInput, TestAgentModelInput } from './types'
+import { InputItem } from '../types/input-item'
 
 class TestAgent extends Agent {
   constructor(model: BaseChatModel, input: TestAgentInput) {
     super(model, testAgentPrompt, input)
   }
 
-  async process(): Promise<string> {
+  async process(_input: InputItem): Promise<string> {
     /*
      * TODO:
      *  1. prepare prompt ✅

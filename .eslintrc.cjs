@@ -12,6 +12,8 @@ module.exports = {
     'prettier/prettier': 2,
     '@typescript-eslint/no-unused-vars': 'off',
     'unused-imports/no-unused-imports': 'error',
+    'ts-ignore': 'off',
+    'ts-expect-error': 'off',
   },
   env: {
     node: true,

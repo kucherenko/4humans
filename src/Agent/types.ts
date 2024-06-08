@@ -13,6 +13,11 @@ interface TestAgentModelInput {
   tests: string
 }
 
+interface RepoSource {
+  code: string
+  tests: string
+}
+
 interface CoverageAgentModelInput {
   code: string
   tests: string
@@ -39,4 +44,5 @@ export {
   CoverageAgentModelInput,
   MutationAgentInput,
   LinterAgentInput,
+  RepoSource,
 }

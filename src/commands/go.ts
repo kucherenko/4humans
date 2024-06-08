@@ -108,22 +108,14 @@ export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
 
   const agentModel = getAIModel(model)
 
-  const coverageAgent = new CoverageAgent(agentModel, finalInputData as never)
-  const coverageAgentOutput = await coverageAgent.process()
-
-  logger.log(coverageAgentOutput)
+  const coverageAgent = new CoverageAgent(agentModel)
+  // const linterAgent = new LinterAgent(agentModel)
+  // const mutationAgent = new MutationAgent(agentModel)
+  // const testAgent = new TestAgent(agentModel)
 
   const agentManager = new AgentsManager(finalInputData)
   agentManager.addAgent(coverageAgent)
   await agentManager.run()
-
-  // const linterAgent = new LinterAgent(agentModel, {} as never)
-  // const mutationAgent = new MutationAgent(agentModel, {} as never)
-  // const testAgent = new TestAgent(agentModel, {} as never)
-  //
-  // await linterAgent.process()
-  // await mutationAgent.process()
-  // await testAgent.process()
 
   /**
    *

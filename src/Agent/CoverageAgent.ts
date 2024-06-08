@@ -4,26 +4,25 @@ import { RunnableSequence } from '@langchain/core/runnables'
 
 import { Agent } from './Agent'
 import { coverageAgentPrompt } from './prompts'
-import { CoverageAgentInput, CoverageAgentModelInput } from './types'
-import { prepareCoverageAgentInput } from './utils/prepareCoverageAgentInput'
+import { CoverageAgentModelInput } from './types'
+import { InputItem } from '../types/input-item'
 
 class CoverageAgent extends Agent {
-  constructor(model: BaseChatModel, input: CoverageAgentInput) {
-    super(model, coverageAgentPrompt, input)
+  constructor(model: BaseChatModel) {
+    super(model, coverageAgentPrompt)
   }
 
-  async process(): Promise<string> {
+  async process(input: InputItem): Promise<string> {
     const outputParser = new StringOutputParser({})
 
     const chain = RunnableSequence.from([this.prompt, this.model, outputParser])
-    const modelInput = await this.getModelInput()
+    const modelInput: CoverageAgentModelInput = {
+      code: input.code,
+      tests: input.tests[input.path] || '',
+    }
     return chain.invoke({
       ...modelInput,
     })
-  }
-
-  private async getModelInput(): Promise<CoverageAgentModelInput> {
-    return await prepareCoverageAgentInput(this.input as CoverageAgentInput)
   }
 }
 
