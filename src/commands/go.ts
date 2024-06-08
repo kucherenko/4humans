@@ -8,7 +8,6 @@ import { parse } from 'junit2json'
 import { getTestsForUncoveredFiles } from '../utils/uncoverad'
 import { spawnSync } from 'node:child_process'
 import { AIModel, getAIModel } from '../utils/chatModels'
-import { prepareCoverageAgentInput } from '../Agent/utils/prepareCoverageAgentInput'
 
 interface GoArgv {
   repo?: string

@@ -31,4 +31,12 @@ interface LinterAgentInput extends AgentInput {
   // Additional properties for LinterAgent
 }
 
-export { AgentInput, TestAgentInput, TestAgentModelInput, CoverageAgentInput, CoverageAgentModelInput, MutationAgentInput, LinterAgentInput }
+export {
+  AgentInput,
+  TestAgentInput,
+  TestAgentModelInput,
+  CoverageAgentInput,
+  CoverageAgentModelInput,
+  MutationAgentInput,
+  LinterAgentInput,
+}
