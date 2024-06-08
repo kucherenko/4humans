@@ -31,6 +31,30 @@ const testAgentPrompt: AgentPrompt = [
   ],
 ]
 
+export const enumeratorAgentPrompt: AgentPrompt = [
+  [
+    'system',
+    `Act as a software developer. Analyze tests for the provided code and identify Enumerator anti-pattern.  
+     Enumerator - Unit tests where each test case method name is only an enumeration, e.g. test1, test2, test3. As a result, the intention of the test case is unclear, and the only way to be sure is to read the test case code and pray for clarity.
+    Write list of blocks with the issues and suggest improvements.
+    
+     Code:
+    {code}
+  
+    Existing tests:
+    {tests}
+  
+   Return the list short (up to 200 symbols) and clear suggestions for code blocks to improve them, skip the recommendation if it is not Enumerator anti-pattern.
+  ---recommendation---
+  Suggestion:
+  <suggestion to improve>
+  Code:
+  <block of code with anti-pattern>
+  ---end---
+   `,
+  ],
+]
+
 const coverageAgentPrompt: AgentPrompt = [
   [
     'system',

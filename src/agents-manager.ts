@@ -17,6 +17,7 @@ export class AgentsManager {
     logger.log('Running agents...')
     const results = []
 
+    // @ts-expect-error coverage
     const { coverage = {} }: { coverage: Record<string, object> } = this.finalInputData
 
     for (const [file, tests] of Object.entries(this.finalInputData?.files)) {

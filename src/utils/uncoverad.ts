@@ -67,6 +67,7 @@ export function describeCoverageReport(coverage: Coverage): unknown {
   const uncoveredStatements = Object.entries(coverage.s)
     .filter(([, statement]) => statement === 0)
     .map(([statement]) => statement)
+
   const uncoveredBranches = Object.entries(coverage.b)
     .filter(([, branches]) => branches.some((branch: number) => branch === 0))
     .map(([branch]) => {
@@ -78,6 +79,7 @@ export function describeCoverageReport(coverage: Coverage): unknown {
           }
         : {}
     })
+
   const uncoveredFunctions = Object.entries(coverage.f)
     .filter(([, functionCoverage]) => functionCoverage === 0)
     .map(([funct]) => {

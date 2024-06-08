@@ -3,7 +3,7 @@ import { logger } from '../logger'
 import degit from 'degit'
 import { bold } from 'picocolors'
 import { existsSync, readFileSync, readJSONSync } from 'fs-extra'
-import { CoverageAgent /*, LinterAgent, MutationAgent, TestAgent*/, TestAgent } from '../Agent'
+import { CoverageAgent, EnumeratorAgent /*, LinterAgent, MutationAgent, TestAgent*/, TestAgent } from '../Agent'
 import { parse } from 'junit2json'
 import { getTestsFiles } from '../utils/uncoverad'
 import { spawnSync } from 'node:child_process'
@@ -110,13 +110,14 @@ export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
 
   const testAgent = new TestAgent(agentModel)
   const coverageAgent = new CoverageAgent(agentModel)
+  const enuAgent = new EnumeratorAgent(agentModel)
   // const linterAgent = new LinterAgent(agentModel)
   // const mutationAgent = new MutationAgent(agentModel)
 
   const agentManager = new AgentsManager(finalInputData)
   agentManager.addAgent(testAgent)
   agentManager.addAgent(coverageAgent)
-  // agentManager.addAgent(linterAgent)
+  agentManager.addAgent(enuAgent)
   // agentManager.addAgent(mutationAgent)
 
   await agentManager.run()
