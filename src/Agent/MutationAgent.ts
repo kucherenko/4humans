@@ -9,8 +9,8 @@ class MutationAgent extends Agent {
     super(model, mutationAgentPrompt, input)
   }
 
-  async process(): Promise<never> {
-    throw new Error('Method not implemented.')
+  async process(): Promise<string> {
+    return Promise.resolve('')
   }
 }
 

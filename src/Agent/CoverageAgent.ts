@@ -1,4 +1,6 @@
 import { BaseChatModel } from '@langchain/core/language_models/chat_models'
+import { StringOutputParser } from '@langchain/core/output_parsers'
+import { RunnableSequence } from '@langchain/core/runnables'
 
 import { Agent } from './Agent'
 import { coverageAgentPrompt } from './prompts'
@@ -9,8 +11,14 @@ class CoverageAgent extends Agent {
     super(model, coverageAgentPrompt, input)
   }
 
-  async process(): Promise<never> {
-    throw new Error('Method not implemented.')
+  async process(): Promise<string> {
+    const outputParser = new StringOutputParser({})
+
+    const chain = RunnableSequence.from([this.prompt, this.model, outputParser])
+
+    return chain.invoke({
+      ...this.input,
+    })
   }
 }
 

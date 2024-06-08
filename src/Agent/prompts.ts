@@ -1,4 +1,12 @@
-const testAgentPrompt = `
+import { BaseMessagePromptTemplateLike, ChatPromptTemplate } from '@langchain/core/prompts'
+import { InputValues } from '@langchain/core/memory'
+
+type AgentPrompt = (ChatPromptTemplate<InputValues, string> | BaseMessagePromptTemplateLike)[]
+
+const testAgentPrompt: AgentPrompt = [
+  [
+    'system',
+    `
   Act as a principal software engineer in Typescript and JavaScript and expert in Unit Testing following RITE way, where tests should be Readable, Isolated, Thorough, Explict.
 
   Use these practices to analyze the provided test report and identify any issues with the current tests.
@@ -8,9 +16,6 @@ const testAgentPrompt = `
   If code is good, just say it's good.
 
   If code is not satisfactory, provide instructions on how to improve the unit tests code, use code blocks instead of writing all code again.
-
-  Test report:
-  {testReport}
 
   Code:
   {code}
@@ -22,25 +27,34 @@ const testAgentPrompt = `
   ---<path to test>---
   <test code analysis>
   ---end---
-  `
+  `,
+  ],
+]
 
-const coverageAgentPrompt = `
-  Act as a software developer. Analyze the test coverage report for the provided code and identify parts of the code that are not covered by tests.
-  Write tests to cover the uncovered parts of the code.
-
-  Coverage report:
-  {coverage}
-
-  Code:
-  {code}
-
-  Return the new tests in the following format:
+const coverageAgentPrompt: AgentPrompt = [
+  [
+    'system',
+    `Act as a software developer. Analyze the test coverage report for the provided code and identify parts of the code that are not covered by tests. 
+    Write tests to cover the uncovered parts of the code.
+    
+     Code:
+    {code}
+  
+    Existing tests:
+    {tests}
+  
+   Return the improved tests in the following format:
   ---<path to test>---
-  <test code>
+  <test code analysis>
   ---end---
-  `
+   `,
+  ],
+]
 
-const mutationAgentPrompt = `
+const mutationAgentPrompt: AgentPrompt = [
+  [
+    'system',
+    `
   Act as a software developer. Perform mutation testing on the provided codebase. Identify weak tests and suggest improvements or additional tests to catch mutations.
 
   Code:
@@ -56,9 +70,14 @@ const mutationAgentPrompt = `
   ---<path to test>---
   <test code>
   ---end---
-  `
+  `,
+  ],
+]
 
-const linterAgentPrompt = `
+const linterAgentPrompt: AgentPrompt = [
+  [
+    'system',
+    `
   Act as a software developer. Analyze the codebase for any linter issues. Suggest and implement improvements to fix the linter issues.
 
   Code:
@@ -71,6 +90,8 @@ const linterAgentPrompt = `
   ---<path to code file>---
   <code>
   ---end---
-  `
+  `,
+  ],
+]
 
-export { testAgentPrompt, coverageAgentPrompt, mutationAgentPrompt, linterAgentPrompt }
+export { testAgentPrompt, coverageAgentPrompt, mutationAgentPrompt, linterAgentPrompt, AgentPrompt }
