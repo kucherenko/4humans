@@ -16,7 +16,7 @@ abstract class Agent {
     this.input = input
   }
 
-  abstract process(input: InputItem): Promise<string>
+  abstract process(input: InputItem): Promise<string | Record<string, string>>
 }
 
 export { Agent }

@@ -19,6 +19,7 @@ interface RepoSource {
 }
 
 interface CoverageAgentModelInput {
+  path: string
   code: string
   tests: string
   coverageReport: string

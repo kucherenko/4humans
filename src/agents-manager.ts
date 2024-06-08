@@ -15,7 +15,7 @@ export class AgentsManager {
 
   async run() {
     logger.log('Running agents...')
-    const results = []
+    const results: Array<string | Record<string, string>> = []
 
     const { coverage }: { coverage: Record<string, object> } = this.finalInputData
 
