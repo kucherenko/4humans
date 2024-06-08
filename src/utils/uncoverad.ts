@@ -16,14 +16,16 @@ interface TestOptions {
   path?: string
   include?: string[]
   ignore?: string[]
+  uncoveredOnly?: boolean
 }
-export async function getTestsForUncoveredFiles(
+export async function getTestsFiles(
   coverage: Record<string, Coverage>,
   options: TestOptions = {},
 ): Promise<Record<string, string[]>> {
   const {
     path = process.cwd(),
     include = ['**/*.{test,spec}.?(c|m)[jt]s?(x)'],
+    uncoveredOnly = false,
     ignore = [
       '**/node_modules/**',
       '**/dist/**',
@@ -32,8 +34,8 @@ export async function getTestsForUncoveredFiles(
       '**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*',
     ],
   } = options
-  const uncovered = getUncoveredFiles(coverage)
-  const uncoveredFiles = uncovered.map((e) => {
+  const files = uncoveredOnly ? getUncoveredFiles(coverage) : Object.values(coverage)
+  const listFiles = files.map((e) => {
     return e.path
   })
   const tests = await glob(include, {
@@ -49,11 +51,11 @@ export async function getTestsForUncoveredFiles(
       directory: path,
       filter: (p) => p.indexOf('node_modules') === -1,
     })
-    for (const uncoveredFile of uncoveredFiles) {
-      if (dependencies.includes(uncoveredFile)) {
-        result[uncoveredFile] = (result[uncoveredFile] as string[]) || []
-        if (!(result[uncoveredFile] as string[]).includes(file)) {
-          ;(result[uncoveredFile] as string[]).push(file)
+    for (const fileItem of listFiles) {
+      if (dependencies.includes(fileItem)) {
+        result[fileItem] = (result[fileItem] as string[]) || []
+        if (!(result[fileItem] as string[]).includes(file)) {
+          ;(result[fileItem] as string[]).push(file)
         }
       }
     }
