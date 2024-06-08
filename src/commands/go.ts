@@ -8,7 +8,6 @@ import { parse } from 'junit2json'
 import { getTestsFiles } from '../utils/uncoverad'
 import { spawnSync } from 'node:child_process'
 import { AIModel, getAIModel } from '../utils/chatModels'
-import { prepareCoverageAgentInput } from '../Agent/utils/prepareCoverageAgentInput'
 import { FinalInputData } from '../types/final-input-data'
 import { AgentsManager } from '../agents-manager'
 
@@ -109,23 +108,14 @@ export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
 
   const agentModel = getAIModel(model)
 
-  const coverageAgentInput = await prepareCoverageAgentInput(finalInputData.uncovered)
-  const coverageAgent = new CoverageAgent(agentModel, coverageAgentInput)
-  // const coverageAgentOutput = await coverageAgent.process()
-
-  // logger.log(coverageAgentOutput)
+  const coverageAgent = new CoverageAgent(agentModel)
+  // const linterAgent = new LinterAgent(agentModel)
+  // const mutationAgent = new MutationAgent(agentModel)
+  // const testAgent = new TestAgent(agentModel)
 
   const agentManager = new AgentsManager(finalInputData)
   agentManager.addAgent(coverageAgent)
   await agentManager.run()
-
-  // const linterAgent = new LinterAgent(agentModel, {} as never)
-  // const mutationAgent = new MutationAgent(agentModel, {} as never)
-  // const testAgent = new TestAgent(agentModel, {} as never)
-  //
-  // await linterAgent.process()
-  // await mutationAgent.process()
-  // await testAgent.process()
 
   /**
    *

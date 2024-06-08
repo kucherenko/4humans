@@ -18,9 +18,14 @@ interface RepoSource {
   tests: string
 }
 
-interface CoverageAgentInput extends AgentInput {
+interface CoverageAgentModelInput {
   code: string
   tests: string
+}
+
+interface CoverageAgentInput extends AgentInput {
+  codePath: string
+  testsPaths: string[]
 }
 
 interface MutationAgentInput extends AgentInput {
@@ -36,6 +41,7 @@ export {
   TestAgentInput,
   TestAgentModelInput,
   CoverageAgentInput,
+  CoverageAgentModelInput,
   MutationAgentInput,
   LinterAgentInput,
   RepoSource,
