@@ -8,8 +8,8 @@ import { TestAgentInput, TestAgentModelInput } from './types'
 import { InputItem } from '../types/input-item'
 
 class TestAgent extends Agent {
-  constructor(model: BaseChatModel, input: TestAgentInput) {
-    super(model, testAgentPrompt, input)
+  constructor(model: BaseChatModel) {
+    super(model, testAgentPrompt)
   }
 
   async process(_input: InputItem): Promise<string> {
