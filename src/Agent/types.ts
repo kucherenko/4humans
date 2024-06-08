@@ -13,9 +13,14 @@ interface TestAgentModelInput {
   tests: string
 }
 
-interface CoverageAgentInput extends AgentInput {
+interface CoverageAgentModelInput {
   code: string
   tests: string
+}
+
+interface CoverageAgentInput extends AgentInput {
+  codePath: string
+  testsPaths: string[]
 }
 
 interface MutationAgentInput extends AgentInput {
@@ -26,4 +31,4 @@ interface LinterAgentInput extends AgentInput {
   // Additional properties for LinterAgent
 }
 
-export { AgentInput, TestAgentInput, TestAgentModelInput, CoverageAgentInput, MutationAgentInput, LinterAgentInput }
+export { AgentInput, TestAgentInput, TestAgentModelInput, CoverageAgentInput, CoverageAgentModelInput, MutationAgentInput, LinterAgentInput }

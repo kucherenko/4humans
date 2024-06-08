@@ -4,7 +4,8 @@ import { RunnableSequence } from '@langchain/core/runnables'
 
 import { Agent } from './Agent'
 import { coverageAgentPrompt } from './prompts'
-import { CoverageAgentInput } from './types'
+import { CoverageAgentInput, CoverageAgentModelInput } from './types'
+import { prepareCoverageAgentInput } from './utils/prepareCoverageAgentInput'
 
 class CoverageAgent extends Agent {
   constructor(model: BaseChatModel, input: CoverageAgentInput) {
@@ -15,10 +16,14 @@ class CoverageAgent extends Agent {
     const outputParser = new StringOutputParser({})
 
     const chain = RunnableSequence.from([this.prompt, this.model, outputParser])
-
+    const modelInput = await this.getModelInput()
     return chain.invoke({
-      ...this.input,
+      ...modelInput,
     })
+  }
+
+  private async getModelInput(): Promise<CoverageAgentModelInput> {
+    return await prepareCoverageAgentInput(this.input as CoverageAgentInput)
   }
 }
 

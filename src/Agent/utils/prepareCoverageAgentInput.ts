@@ -1,21 +1,12 @@
 import { readFiles } from '../../utils/fileUtils'
 import { logger } from '../../logger'
-import { CoverageAgentInput } from '../types'
+import { CoverageAgentInput, CoverageAgentModelInput } from '../types'
 
-async function prepareCoverageAgentInput(uncovered: Record<string, string[]>): Promise<CoverageAgentInput> {
-  const codeFilePaths: Set<string> = new Set()
-  const testFilePaths: Set<string> = new Set()
-
-  for (const [key, paths] of Object.entries(uncovered)) {
-    codeFilePaths.add(key)
-    paths.forEach((path) => testFilePaths.add(path))
-  }
-
-  const uniqueCodeFilePaths = Array.from(codeFilePaths)
-  const uniqueTestFilePaths = Array.from(testFilePaths)
+async function prepareCoverageAgentInput(input: CoverageAgentInput): Promise<CoverageAgentModelInput> {
+  const { codePath, testsPaths } = input
 
   try {
-    const [code, tests] = await Promise.all([readFiles(uniqueCodeFilePaths), readFiles(uniqueTestFilePaths)])
+    const [code, tests] = await Promise.all([readFiles([codePath]), readFiles(testsPaths)])
 
     return { code, tests }
   } catch (error) {
