@@ -4,8 +4,8 @@ import { RunnableSequence } from '@langchain/core/runnables'
 
 import { Agent } from './Agent'
 import { testAgentPrompt } from './prompts'
-import { TestAgentInput, TestAgentModelInput } from './types'
 import { InputItem } from '../types/input-item'
+import { TestAgentModelInput } from 'src/Agent/types'
 
 class TestAgent extends Agent {
   constructor(model: BaseChatModel) {
@@ -13,31 +13,17 @@ class TestAgent extends Agent {
   }
 
   async process(_input: InputItem): Promise<string> {
-    /*
-     * TODO:
-     *  1. prepare prompt ✅
-     *  2. format data to pass to model ✅
-     *  3. call model ✅
-     *  4. format output for console display
-     *  5. return data back to orchestrator (future)
-     */
-
     const outputParser = new StringOutputParser({})
 
     const chain = RunnableSequence.from([this.prompt, this.model, outputParser])
 
-    return chain.invoke({
-      ...this.modelInput,
-    })
-  }
-
-  private get modelInput(): TestAgentModelInput {
-    const i = this.input as TestAgentInput
-    return {
-      testReport: JSON.stringify(i?.report, null, 2),
-      code: JSON.stringify(i?.code, null, 2),
-      tests: JSON.stringify(i?.tests, null, 2),
+    const modelInput: TestAgentModelInput = {
+      code: _input.code,
+      tests: _input.tests[_input.path] || '',
+      testReport: JSON.stringify(_input.report, null, 2),
     }
+
+    return chain.invoke(modelInput)
   }
 }
 
