@@ -7,6 +7,7 @@ export interface RepoConfig {
   test: {
     command: string
     coverage: string
+    report: string
   }
   mutation?: {
     command: string
