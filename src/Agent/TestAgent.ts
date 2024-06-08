@@ -34,9 +34,9 @@ class TestAgent extends Agent {
   private get modelInput(): TestAgentModelInput {
     const i = this.input as TestAgentInput
     return {
-      testReport: JSON.stringify(i.report, null, 2),
-      code: JSON.stringify(i.code, null, 2),
-      tests: JSON.stringify(i.tests, null, 2),
+      testReport: JSON.stringify(i?.report, null, 2),
+      code: JSON.stringify(i?.code, null, 2),
+      tests: JSON.stringify(i?.tests, null, 2),
     }
   }
 }

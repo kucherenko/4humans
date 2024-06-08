@@ -23,6 +23,11 @@ interface CoverageAgentModelInput {
   tests: string
 }
 
+export interface EnumeratorAgentModelInput {
+  code: string
+  tests: string[]
+}
+
 interface CoverageAgentInput extends AgentInput {
   codePath: string
   testsPaths: string[]
