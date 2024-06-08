@@ -6,7 +6,8 @@ Run the app in development mode:
 pnpm start go <repo-url>
 ```
 
-e.g. 
+e.g.
+
 ```shell
 pnpm start go https://github.com/kucherenko/logger-dogger
 ```

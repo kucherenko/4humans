@@ -1,6 +1,5 @@
 import { glob } from 'glob'
 import { Coverage } from '../types/coverage'
-import { logger } from '../logger'
 import dependencyTree from 'dependency-tree'
 
 export function getUncoveredFiles(coverage: Record<string, Coverage>): Coverage[] {
