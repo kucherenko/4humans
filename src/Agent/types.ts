@@ -13,6 +13,11 @@ interface TestAgentModelInput {
   tests: string
 }
 
+interface RepoSource {
+  code: string
+  tests: string
+}
+
 interface CoverageAgentInput extends AgentInput {
   code: string
   tests: string
@@ -26,4 +31,12 @@ interface LinterAgentInput extends AgentInput {
   // Additional properties for LinterAgent
 }
 
-export { AgentInput, TestAgentInput, TestAgentModelInput, CoverageAgentInput, MutationAgentInput, LinterAgentInput }
+export {
+  AgentInput,
+  TestAgentInput,
+  TestAgentModelInput,
+  CoverageAgentInput,
+  MutationAgentInput,
+  LinterAgentInput,
+  RepoSource,
+}
