@@ -120,7 +120,8 @@ export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
   agentManager.addAgent(enuAgent)
   // agentManager.addAgent(mutationAgent)
 
-  await agentManager.run()
+  const results = await agentManager.run()
+  results.forEach((reSult) => logger.log(reSult))
 
   /**
    *
