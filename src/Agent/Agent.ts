@@ -14,7 +14,7 @@ abstract class Agent {
     this.input = input
   }
 
-  abstract process(): Promise<never>
+  abstract process(): Promise<string>
 }
 
 export { Agent }
