@@ -84,7 +84,6 @@
     "degit": "^2.8.4",
     "dependency-tree": "^11.0.1",
     "dotenv": "^16.4.5",
-    "execa": "^9.2.0",
     "fs-extra": "^11.2.0",
     "giget": "^1.2.3",
     "glob": "^10.4.1",

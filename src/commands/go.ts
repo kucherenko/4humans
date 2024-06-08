@@ -3,15 +3,16 @@ import { logger } from '../logger'
 import degit from 'degit'
 import { bold } from 'picocolors'
 import { existsSync, readFileSync, readJSONSync } from 'fs-extra'
-import { spawnSync } from 'node:child_process'
 import { CoverageAgent, LinterAgent, MutationAgent, TestAgent } from '../Agent'
 import { ChatOpenAI } from '@langchain/openai'
 import { parse } from 'junit2json'
 import { getTestsForUncoveredFiles } from '../utils/uncoverad'
+import { spawnSync } from 'node:child_process'
 
 interface GoArgv {
   repo?: string
   path?: string
+  skipCloning?: boolean
 }
 
 export const command = 'go <repo>'
@@ -31,12 +32,19 @@ export function builder(yargs: Argv) {
       default: '',
       describe: 'The path to clone the repository.',
     })
+    .option('skip-cloning', {
+      alias: 's',
+      type: 'boolean',
+      default: false,
+      describe: 'Skip cloning the repository.',
+    })
 }
 
 export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
   const { repo = '', path } = argv
 
   let pathInput = path
+
   if (!path) {
     const repoName = repo.split('/').pop()
     pathInput = await logger.prompt<{ type: 'text'; initial: string }>('Enter the path to clone the repository', {
@@ -44,11 +52,17 @@ export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
       type: 'text',
     })
   }
+  if (!existsSync(pathInput as string)) {
+    await degit(repo).clone(pathInput as string)
+    logger.success(`Repository ${bold(repo)} cloned to ${bold(path)}...`)
+  } else {
+    logger.success(`Repository ${bold(repo)} already cloned to ${bold(path)}...`)
+  }
 
-  await degit(repo).clone(pathInput as string)
-  logger.success(`Repository ${bold(repo)} cloned to ${bold(path)}...`)
-  logger.success('Start analysis...')
   process.chdir(pathInput as string)
+
+  logger.success('Start analysis...')
+
   const config = existsSync('.4humans.json')
     ? readJSONSync('.4humans.json')
     : {
@@ -60,8 +74,14 @@ export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
         },
       }
 
-  spawnSync(config.install, { shell: true })
-  spawnSync(config.test.command, { shell: true })
+  spawnSync(config.install, {
+    shell: true,
+  })
+  const tests = spawnSync(config.test.command, {
+    shell: true,
+  })
+
+  logger.log(tests.status, tests.stderr.toString())
 
   const report = existsSync(config.test.report) ? await parse(readFileSync(config.test.report, 'utf-8').toString()) : ''
   const coverageReport = existsSync(config.test.coverage) ? readJSONSync(config.test.coverage) : {}
@@ -70,6 +90,7 @@ export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
     execution: report,
     uncovered: getTestsForUncoveredFiles(coverageReport),
     coverage: coverageReport,
+    errors: tests.status ? tests.stderr.toString() : '',
   }
 
   logger.debug(finalInputData)
