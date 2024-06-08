@@ -16,9 +16,11 @@ class CoverageAgent extends Agent {
     const outputParser = new StringOutputParser({})
 
     const chain = RunnableSequence.from([this.prompt, this.model, outputParser])
+
     const modelInput: CoverageAgentModelInput = {
       code: input.code,
       tests: input.tests[input.path] || '',
+      coverageReport: JSON.stringify(input.coverage),
     }
     return chain.invoke({
       ...modelInput,

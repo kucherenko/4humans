@@ -34,18 +34,21 @@ const testAgentPrompt: AgentPrompt = [
 const coverageAgentPrompt: AgentPrompt = [
   [
     'system',
-    `Act as a software developer. Analyze the test coverage report for the provided code and identify parts of the code that are not covered by tests. 
-    Write tests to cover the uncovered parts of the code.
+    `Act as a experienced software developer. Analyze the test coverage report for the provided code and identify parts of the code that are not covered by tests. 
+    Write tests to cover the uncovered parts of the code. Only write a code in your answer. If no tests are needed, just say that the code is fully covered.
     
-     Code:
+    Code:
     {code}
   
     Existing tests:
     {tests}
+    
+    Coverage report:
+    {coverageReport}
   
    Return the improved tests in the following format:
   ---<path to test>---
-  <test code analysis>
+  <test code>
   ---end---
    `,
   ],
