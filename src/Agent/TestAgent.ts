@@ -5,7 +5,6 @@ import { RunnableSequence } from '@langchain/core/runnables'
 import { Agent } from './Agent'
 import { testAgentPrompt } from './prompts'
 import { TestAgentInput, TestAgentModelInput } from './types'
-import { PromptTemplate } from '@langchain/core/prompts'
 
 class TestAgent extends Agent {
   constructor(model: BaseChatModel, input: TestAgentInput) {
@@ -23,9 +22,8 @@ class TestAgent extends Agent {
      */
 
     const outputParser = new StringOutputParser({})
-    const promptTemplate = new PromptTemplate(this.prompt)
 
-    const chain = RunnableSequence.from([promptTemplate, this.model, outputParser])
+    const chain = RunnableSequence.from([this.prompt, this.model, outputParser])
 
     return chain.invoke({
       ...this.modelInput,

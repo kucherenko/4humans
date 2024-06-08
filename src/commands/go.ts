@@ -3,11 +3,12 @@ import { logger } from '../logger'
 import degit from 'degit'
 import { bold } from 'picocolors'
 import { existsSync, readFileSync, readJSONSync } from 'fs-extra'
-import { CoverageAgent, LinterAgent, MutationAgent, TestAgent } from '../Agent'
+import { CoverageAgent /*, LinterAgent, MutationAgent, TestAgent*/ } from '../Agent'
 import { parse } from 'junit2json'
 import { getTestsForUncoveredFiles } from '../utils/uncoverad'
 import { spawnSync } from 'node:child_process'
 import { AIModel, getAIModel } from '../utils/chatModels'
+import { prepareCoverageAgentInput } from '../Agent/utils/prepareCoverageAgentInput'
 
 interface GoArgv {
   repo?: string
@@ -92,27 +93,28 @@ export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
 
   const report = existsSync(config.test.report) ? await parse(readFileSync(config.test.report, 'utf-8').toString()) : ''
   const coverageReport = existsSync(config.test.coverage) ? readJSONSync(config.test.coverage) : {}
-
+  const uncovered = await getTestsForUncoveredFiles(coverageReport)
   const finalInputData = {
     execution: report,
-    uncovered: getTestsForUncoveredFiles(coverageReport),
+    uncovered,
     coverage: coverageReport,
     errors: tests.status ? tests.stderr.toString() : '',
   }
 
-  logger.debug(finalInputData)
-
   const agentModel = getAIModel(model)
 
-  const coverageAgent = new CoverageAgent(agentModel, {} as never)
-  const linterAgent = new LinterAgent(agentModel, {} as never)
-  const mutationAgent = new MutationAgent(agentModel, {} as never)
-  const testAgent = new TestAgent(agentModel, {} as never)
+  const coverageAgentInput = await prepareCoverageAgentInput(finalInputData.uncovered)
+  const coverageAgent = new CoverageAgent(agentModel, coverageAgentInput)
+  const coverageAgentOutput = await coverageAgent.process()
+  logger.log(coverageAgentOutput)
 
-  await coverageAgent.process()
-  await linterAgent.process()
-  await mutationAgent.process()
-  await testAgent.process()
+  // const linterAgent = new LinterAgent(agentModel, {} as never)
+  // const mutationAgent = new MutationAgent(agentModel, {} as never)
+  // const testAgent = new TestAgent(agentModel, {} as never)
+  //
+  // await linterAgent.process()
+  // await mutationAgent.process()
+  // await testAgent.process()
 
   /**
    *

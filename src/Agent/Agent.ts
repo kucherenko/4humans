@@ -1,16 +1,17 @@
 import { BaseChatModel } from '@langchain/core/language_models/chat_models'
-import { PromptTemplate } from '@langchain/core/prompts'
+import { ChatPromptTemplate } from '@langchain/core/prompts'
 
 import { AgentInput } from './types'
+import { AgentPrompt } from './prompts'
 
 abstract class Agent {
   protected model: BaseChatModel
-  protected prompt: PromptTemplate
+  protected prompt: ChatPromptTemplate
   protected input: AgentInput
 
-  protected constructor(model: BaseChatModel, prompt: string, input: AgentInput) {
+  protected constructor(model: BaseChatModel, prompt: AgentPrompt, input: AgentInput) {
     this.model = model
-    this.prompt = PromptTemplate.fromTemplate(prompt)
+    this.prompt = ChatPromptTemplate.fromMessages(prompt)
     this.input = input
   }
 

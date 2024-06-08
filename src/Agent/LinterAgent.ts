@@ -9,8 +9,8 @@ class LinterAgent extends Agent {
     super(model, linterAgentPrompt, input)
   }
 
-  async process(): Promise<never> {
-    throw new Error('Method not implemented.')
+  async process(): Promise<string> {
+    return Promise.resolve('')
   }
 }
 

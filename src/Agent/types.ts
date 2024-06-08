@@ -1,6 +1,4 @@
-interface AgentInput {
-  projectPath: string
-}
+interface AgentInput {}
 
 interface TestAgentInput extends AgentInput {
   // Additional properties for TestAgent
@@ -16,7 +14,8 @@ interface TestAgentModelInput {
 }
 
 interface CoverageAgentInput extends AgentInput {
-  // Additional properties for CoverageAgent
+  code: string
+  tests: string
 }
 
 interface MutationAgentInput extends AgentInput {
