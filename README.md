@@ -1,3 +1,17 @@
+# 4Humans
+
+Run the app in development mode:
+
+```sh
+pnpm start go <repo-url>
+```
+
+e.g.
+
+```shell
+pnpm start go https://github.com/kucherenko/logger-dogger
+```
+
 # CLI TypeScript Starter
 
 An all-inclusive starter kit for crafting command-line interfaces (CLI) using TypeScript, driven by Node.js. This kit is
