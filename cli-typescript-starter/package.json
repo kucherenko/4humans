@@ -48,8 +48,6 @@
     "@commitlint/config-conventional": "^18.6.3",
     "@jest/globals": "^29.7.0",
     "@tsconfig/node20": "^20.1.4",
-    "@types/degit": "^2.8.6",
-    "@types/fs-extra": "^11.0.4",
     "@types/jest": "^29.5.12",
     "@types/node": "^20.12.12",
     "@types/prompts": "^2.4.9",
@@ -76,9 +74,7 @@
   },
   "dependencies": {
     "consola": "^3.2.3",
-    "degit": "^2.8.4",
     "dotenv": "^16.4.5",
-    "fs-extra": "^11.2.0",
     "giget": "^1.2.3",
     "picocolors": "^1.0.1",
     "yargs": "^17.7.2"
