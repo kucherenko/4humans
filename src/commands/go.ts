@@ -2,9 +2,11 @@ import { ArgumentsCamelCase, Argv } from 'yargs'
 import { logger } from '../logger'
 import degit from 'degit'
 import { bold } from 'picocolors'
-import { readJSONSync } from 'fs-extra'
+import { existsSync, readJSONSync } from 'fs-extra'
+import { spawnSync } from 'node:child_process'
 import { CoverageAgent, LinterAgent, MutationAgent, TestAgent } from '../Agent'
 import { ChatOpenAI } from '@langchain/openai'
+import { getTestsForUncoveredFiles } from '../utils/uncoverad'
 
 interface GoArgv {
   repo?: string
@@ -46,8 +48,24 @@ export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
   logger.success(`Repository ${bold(repo)} cloned to ${bold(path)}...`)
   logger.success('Start analysis...')
   process.chdir(pathInput as string)
-  const config = readJSONSync('.4humans.json')
-  logger.box(config)
+  const config = existsSync('.4humans.json')
+    ? readJSONSync('.4humans.json')
+    : {
+        install: 'pnpm install',
+        test: {
+          command: 'pnpm test -- --coverage',
+          coverage: './coverage/coverage-final.json',
+        },
+      }
+  logger.log(config)
+  spawnSync(config.install, { shell: true, stdio: 'inherit' })
+  spawnSync(config.test.command, { shell: true, stdio: 'inherit' })
+
+  const coverageReport = readJSONSync(config.test.coverage)
+
+  logger.log(coverageReport)
+
+  logger.log(await getTestsForUncoveredFiles(coverageReport))
 
   const model = new ChatOpenAI({
     modelName: 'gpt-3.5-turbo-16k',

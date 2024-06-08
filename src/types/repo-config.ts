@@ -1,4 +1,5 @@
 export interface RepoConfig {
+  install: string
   build?: {
     base: string
     command: string
