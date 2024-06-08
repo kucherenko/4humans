@@ -5,9 +5,11 @@ import { bold } from 'picocolors'
 import { existsSync, readFileSync, readJSONSync } from 'fs-extra'
 import { CoverageAgent /*, LinterAgent, MutationAgent, TestAgent*/ } from '../Agent'
 import { parse } from 'junit2json'
-import { getTestsForUncoveredFiles } from '../utils/uncoverad'
+import { getTestsFiles } from '../utils/uncoverad'
 import { spawnSync } from 'node:child_process'
 import { AIModel, getAIModel } from '../utils/chatModels'
+import { FinalInputData } from '../types/final-input-data'
+import { AgentsManager } from '../agents-manager'
 
 interface GoArgv {
   repo?: string
@@ -88,25 +90,32 @@ export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
     shell: true,
   })
 
-  logger.log(tests.status, tests.stderr.toString())
-
   const report = existsSync(config.test.report) ? await parse(readFileSync(config.test.report, 'utf-8').toString()) : ''
   const coverageReport = existsSync(config.test.coverage) ? readJSONSync(config.test.coverage) : {}
-  const uncovered = await getTestsForUncoveredFiles(coverageReport)
-  const finalInputData = {
+  const uncovered = await getTestsFiles(coverageReport, {
+    uncoveredOnly: true,
+  })
+  const files = await getTestsFiles(coverageReport)
+  const finalInputData: FinalInputData = {
     execution: report,
     uncovered,
+    files,
     coverage: coverageReport,
     errors: tests.status ? tests.stderr.toString() : '',
   }
 
+  logger.log(finalInputData)
+
   const agentModel = getAIModel(model)
 
-  for (const [codePath, testsPaths] of Object.entries(finalInputData.uncovered)) {
-    const coverageAgent = new CoverageAgent(agentModel, { codePath, testsPaths })
-    const coverageAgentOutput = await coverageAgent.process()
-    logger.log(coverageAgentOutput)
-  }
+  const coverageAgent = new CoverageAgent(agentModel, finalInputData as never)
+  const coverageAgentOutput = await coverageAgent.process()
+
+  logger.log(coverageAgentOutput)
+
+  const agentManager = new AgentsManager(finalInputData)
+  agentManager.addAgent(coverageAgent)
+  await agentManager.run()
 
   // const linterAgent = new LinterAgent(agentModel, {} as never)
   // const mutationAgent = new MutationAgent(agentModel, {} as never)
