@@ -21,6 +21,7 @@ interface RepoSource {
 interface CoverageAgentModelInput {
   code: string
   tests: string
+  coverageReport: string
 }
 
 interface CoverageAgentInput extends AgentInput {
