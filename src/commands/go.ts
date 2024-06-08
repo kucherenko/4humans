@@ -3,6 +3,8 @@ import { logger } from '../logger'
 import degit from 'degit'
 import { bold } from 'picocolors'
 import { readJSONSync } from 'fs-extra'
+import { CoverageAgent, LinterAgent, MutationAgent, TestAgent } from '../Agent'
+import { ChatOpenAI } from '@langchain/openai'
 
 interface GoArgv {
   repo?: string
@@ -46,6 +48,21 @@ export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
   process.chdir(pathInput as string)
   const config = readJSONSync('.4humans.json')
   logger.box(config)
+
+  const model = new ChatOpenAI({
+    modelName: 'gpt-3.5-turbo-16k',
+  })
+
+  const coverageAgent = new CoverageAgent(model, {} as never)
+  const linterAgent = new LinterAgent(model, {} as never)
+  const mutationAgent = new MutationAgent(model, {} as never)
+  const testAgent = new TestAgent(model, {} as never)
+
+  await coverageAgent.process()
+  await linterAgent.process()
+  await mutationAgent.process()
+  await testAgent.process()
+
   /**
    *
    * {"code.ts": {
