@@ -4,15 +4,16 @@ import degit from 'degit'
 import { bold } from 'picocolors'
 import { existsSync, readFileSync, readJSONSync } from 'fs-extra'
 import { CoverageAgent, LinterAgent, MutationAgent, TestAgent } from '../Agent'
-import { ChatOpenAI } from '@langchain/openai'
 import { parse } from 'junit2json'
 import { getTestsForUncoveredFiles } from '../utils/uncoverad'
 import { spawnSync } from 'node:child_process'
+import { AIModel, getAIModel } from '../utils/chatModels'
 
 interface GoArgv {
   repo?: string
   path?: string
   skipCloning?: boolean
+  model?: AIModel
 }
 
 export const command = 'go <repo>'
@@ -32,6 +33,12 @@ export function builder(yargs: Argv) {
       default: '',
       describe: 'The path to clone the repository.',
     })
+    .option('model', {
+      alias: 'm',
+      type: 'string',
+      default: 'ollama',
+      describe: 'The AI model to use for agents.',
+    })
     .option('skip-cloning', {
       alias: 's',
       type: 'boolean',
@@ -41,7 +48,7 @@ export function builder(yargs: Argv) {
 }
 
 export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
-  const { repo = '', path } = argv
+  const { repo = '', path, model } = argv
 
   let pathInput = path
 
@@ -95,14 +102,12 @@ export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
 
   logger.debug(finalInputData)
 
-  const model = new ChatOpenAI({
-    modelName: 'gpt-3.5-turbo-16k',
-  })
+  const agentModel = getAIModel(model)
 
-  const coverageAgent = new CoverageAgent(model, {} as never)
-  const linterAgent = new LinterAgent(model, {} as never)
-  const mutationAgent = new MutationAgent(model, {} as never)
-  const testAgent = new TestAgent(model, {} as never)
+  const coverageAgent = new CoverageAgent(agentModel, {} as never)
+  const linterAgent = new LinterAgent(agentModel, {} as never)
+  const mutationAgent = new MutationAgent(agentModel, {} as never)
+  const testAgent = new TestAgent(agentModel, {} as never)
 
   await coverageAgent.process()
   await linterAgent.process()
