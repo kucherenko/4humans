@@ -15,19 +15,43 @@ const testAgentPrompt: AgentPrompt = [
 
   If code is good, just say it's good.
 
-  If code is not satisfactory, provide instructions on how to improve the unit tests code, use code blocks instead of writing all code again.
+  If code is not satisfactory, provide instructions on how to improve the unit tests code using blocks of code instead of writing all code again.
 
   Code:
   {code}
 
-  Existing tests:
+  Existing test:
   {tests}
 
-  Return the improved tests in the following format:
+  Return analysis of tests in the following format:
   ---<path to test>---
   <test code analysis>
   ---end---
   `,
+  ],
+]
+
+export const enumeratorAgentPrompt: AgentPrompt = [
+  [
+    'system',
+    `Act as a software developer. Analyze tests for the provided code and identify Enumerator anti-pattern.
+     Enumerator - Unit tests where each test case method name is only an enumeration, e.g. test1, test2, test3. As a result, the intention of the test case is unclear, and the only way to be sure is to read the test case code and pray for clarity.
+    Write list of blocks with the issues and suggest improvements.
+
+     Code:
+    {code}
+
+    Existing tests:
+    {tests}
+
+   Return the list short (up to 200 symbols) and clear suggestions for code blocks to improve them, skip the recommendation if it is not Enumerator anti-pattern.
+  ---recommendation---
+  Suggestion:
+  <suggestion to improve>
+  Code:
+  <block of code with anti-pattern>
+  ---end---
+   `,
   ],
 ]
 
@@ -37,19 +61,19 @@ const coverageAgentPrompt: AgentPrompt = [
     `Act as a experienced software developer. Analyze the test coverage report for the provided code which has uncovered lines, branches and functions, and identify parts of the code that are not covered by tests. 
     Write tests to cover the uncovered parts of the code. Only write a code in your answer. If no tests are needed, just say that the code is fully covered.
     Use only real path to test from the input.
-    
+
     Path to code file:
     {path}
-    
+
     Code:
     {code}
-  
+
     Existing tests:
     {tests}
-    
+
     Coverage report:
     {coverageReport}
-  
+
    Return the improved tests in the following format:
   ---<path to test>---
   <test code>
