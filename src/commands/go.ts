@@ -2,10 +2,11 @@ import { ArgumentsCamelCase, Argv } from 'yargs'
 import { logger } from '../logger'
 import degit from 'degit'
 import { bold } from 'picocolors'
-import { existsSync, readJSONSync } from 'fs-extra'
+import { existsSync, readFileSync, readJSONSync } from 'fs-extra'
 import { spawnSync } from 'node:child_process'
 import { CoverageAgent, LinterAgent, MutationAgent, TestAgent } from '../Agent'
 import { ChatOpenAI } from '@langchain/openai'
+import { parse } from 'junit2json'
 import { getTestsForUncoveredFiles } from '../utils/uncoverad'
 
 interface GoArgv {
@@ -55,17 +56,23 @@ export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
         test: {
           command: 'pnpm test -- --coverage',
           coverage: './coverage/coverage-final.json',
+          report: './reports/report.xml',
         },
       }
-  logger.log(config)
-  spawnSync(config.install, { shell: true, stdio: 'inherit' })
-  spawnSync(config.test.command, { shell: true, stdio: 'inherit' })
 
-  const coverageReport = readJSONSync(config.test.coverage)
+  spawnSync(config.install, { shell: true })
+  spawnSync(config.test.command, { shell: true })
 
-  logger.log(coverageReport)
+  const report = existsSync(config.test.report) ? await parse(readFileSync(config.test.report, 'utf-8').toString()) : ''
+  const coverageReport = existsSync(config.test.coverage) ? readJSONSync(config.test.coverage) : {}
 
-  logger.log(await getTestsForUncoveredFiles(coverageReport))
+  const finalInputData = {
+    execution: report,
+    uncovered: getTestsForUncoveredFiles(coverageReport),
+    coverage: coverageReport,
+  }
+
+  logger.debug(finalInputData)
 
   const model = new ChatOpenAI({
     modelName: 'gpt-3.5-turbo-16k',
