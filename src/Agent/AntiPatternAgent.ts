@@ -5,12 +5,12 @@ import { BaseChatModel } from '@langchain/core/language_models/chat_models'
 import { Agent } from './Agent'
 import { InputItem } from '../types/input-item'
 import { AgentResult, EnumeratorAgentModelInput } from './types'
-import { enumeratorAgentPrompt } from './prompts'
+import { antiPatternAgentPrompt } from './prompts'
 import { parseAgentAnswer } from './utils/parseAgentAnswer'
 
 export class AntiPatternAgent extends Agent {
   constructor(model: BaseChatModel) {
-    super(model, enumeratorAgentPrompt)
+    super(model, antiPatternAgentPrompt)
   }
 
   async process(input: InputItem): Promise<AgentResult> {

@@ -7,7 +7,7 @@ const testAgentPrompt: AgentPrompt = [
   [
     'system',
     `
-  Act as a principal software engineer in Typescript and JavaScript and expert in Unit Testing following RITE way, where tests should be Readable, Isolated, Thorough, Explict.
+  Act as a principal software engineer and expert in Unit Testing following RITE way, where tests should be Readable, Isolated, Thorough, Explict.
 
   Use these practices to analyze the provided test report and identify any issues with the current tests.
 
@@ -23,23 +23,24 @@ const testAgentPrompt: AgentPrompt = [
   Existing test:
   {tests}
 
-  Return analysis of tests in the following format:
-  ---<path to test file>---
-  {
-    "suggestions": [{"text": "<suggestion text>", "code": "<block of code>"],
-    
-    "files": [
-      {"file": "<full test content file>"}
-    ]
-  }
-  ---end---
-  
-  Use Github Markdown format for the output with 3 backticks for code snippets and headings as needed
+  Use only real path to test file from the input. Return analysis of tests strictly in the XML Schema:
+   
+   ---<path to test file>---
+  <block>
+  <suggestion>Suggestion</suggestion>
+  <code>
+    <!CDATA[<block of code for suggestion>]>
+  </code>
+  <file>
+    <!CDATA[<full test content file>]>
+  </file>
+  </block>
+   ---end--- 
   `,
   ],
 ]
 
-export const enumeratorAgentPrompt: AgentPrompt = [
+const antiPatternAgentPrompt: AgentPrompt = [
   [
     'system',
     `Act as a software developer. Analyze tests for the provided code and identify anti-pattern from the list provided below.
@@ -68,19 +69,19 @@ export const enumeratorAgentPrompt: AgentPrompt = [
     {tests}
 
    Return the list short (up to 200 symbols) and clear suggestions for code blocks to improve them, skip the recommendation if it is not anti-pattern from the given list.
-   Use only real path to test file from the input.
-
-  ---<path to test file>---
-  {
-    "suggestions": [{"text": "<suggestion text>", "code": "<block of code with anti-pattern>"],
-    
-    "files": [
-      {"file": "<full test content file>"}
-    ]
-  }
-  ---end---
-
-  Use Github Markdown format for the output with 3 backticks for code snippets and headings as needed
+   Use only real path to test file from the input. Return analysis of tests strictly in the XML Schema:
+   
+   ---<path to test file>---
+  <block>
+  <suggestion>Suggestion</suggestion>
+  <code>
+    <!CDATA[<block of code for suggestion>]>
+  </code>
+  <file>
+    <!CDATA[<full test content file>]>
+  </file>
+  </block>
+   ---end---
    `,
   ],
 ]
@@ -88,12 +89,9 @@ export const enumeratorAgentPrompt: AgentPrompt = [
 const coverageAgentPrompt: AgentPrompt = [
   [
     'system',
-    `Act as a experienced software developer. Analyze the test coverage report for the provided code which has uncovered lines, branches and functions, and identify parts of the code that are not covered by tests. 
+    `Act as an experienced software developer. Analyze the test coverage report for the provided code which has uncovered lines, branches and functions, and identify parts of the code that are not covered by tests. 
     Write tests to cover the uncovered parts of the code. Only write a code in your answer. If no tests are needed, just say that the code is fully covered.
     Use only real path to test file from the input.
-
-    Path to code file:
-    {path}
 
     Code:
     {code}
@@ -104,19 +102,21 @@ const coverageAgentPrompt: AgentPrompt = [
     Coverage report:
     {coverageReport}
 
-   Return the improved tests in the following format:
-  ---<path to test>---
-  {
-    "suggestions": [{"text": "<suggestion text>"],
-    
-    "files": [
-      {"file": "<full test content file>"}
-    ]
-  }
-  ---end---
-  Use Github Markdown format for the output with 3 backticks for code snippets and headings as needed
+   Use only real path to test file from the input. Return analysis of tests strictly in the XML Schema:
+   
+   ---<path to test file>---
+  <block>
+  <suggestion>Suggestion</suggestion>
+  <code>
+    <!CDATA[<block of code for suggestion>]>
+  </code>
+  <file>
+    <!CDATA[<full test content file>]>
+  </file>
+  </block>
+   ---end---
    `,
   ],
 ]
 
-export { testAgentPrompt, coverageAgentPrompt, AgentPrompt }
+export { testAgentPrompt, coverageAgentPrompt, antiPatternAgentPrompt, AgentPrompt }

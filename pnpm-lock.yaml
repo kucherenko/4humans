@@ -99,6 +99,9 @@ importers:
       '@types/signale':
         specifier: ^1.4.7
         version: 1.4.7
+      '@types/xml2js':
+        specifier: ^0.4.14
+        version: 0.4.14
       '@types/yargs':
         specifier: ^17.0.32
         version: 17.0.32
@@ -156,6 +159,9 @@ importers:
       typescript:
         specifier: ^5.4.5
         version: 5.4.5
+      xml2js:
+        specifier: ^0.6.2
+        version: 0.6.2
 
 packages:
 
