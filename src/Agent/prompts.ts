@@ -24,9 +24,16 @@ const testAgentPrompt: AgentPrompt = [
   {tests}
 
   Return analysis of tests in the following format:
-  ---<path to test>---
-  <test code analysis>
+  ---<path to test file>---
+  {
+    "suggestions": [{"text": "<suggestion text>", "code": "<block of code>"],
+    
+    "files": [
+      {"file": "<full test content file>"}
+    ]
+  }
   ---end---
+  
   Use Github Markdown format for the output with 3 backticks for code snippets and headings as needed
   `,
   ],
@@ -35,19 +42,35 @@ const testAgentPrompt: AgentPrompt = [
 export const enumeratorAgentPrompt: AgentPrompt = [
   [
     'system',
-    `Act as a software developer. Analyze tests for the provided code and identify Enumerator anti-pattern.
-     Enumerator - Unit tests where each test case method name is only an enumeration, e.g. test1, test2, test3. As a result, the intention of the test case is unclear, and the only way to be sure is to read the test case code and pray for clarity.
-    Write list of blocks with the issues and suggest improvements.
-
-     Code:
+    `Act as a software developer. Analyze tests for the provided code and identify anti-pattern from the list provided below.
+      1. Cuckoo: A test method that sits in the same unit test but does not really belong there.
+      2. Anal Probe: A test that uses unhealthy methods, such as reading private fields using reflection.
+      3. Conjoined Twins: Tests called unit tests but are actually integration tests due to no isolation between the system-under-test and the tests.
+      4. Happy Path: Tests only the expected results without testing for boundaries and exceptions.
+      5. Giant: A valid unit test that spans thousands of lines and many test cases, often indicating a God Object in the system-under-test.
+      6. Mockery: A unit test with excessive mocks, stubs, and/or fakes, leading to testing the mocks instead of the system-under-test.
+      7. Inspector: A unit test that violates encapsulation to achieve 100% code coverage, making refactoring difficult.
+      8. Generous Leftovers: One unit test creates data that another test reuses, leading to failures if the "generator" test runs afterward or not at all.
+      9. Nitpicker: A unit test comparing complete output when only small parts are relevant, requiring frequent updates for otherwise unimportant details.
+      10. Secret Catcher: A test that relies on an exception to be thrown and caught by the testing framework, appearing to do no testing due to the absence of assertions.
+      11. Dodger: A unit test with lots of tests for minor side effects but never tests the core desired behavior.
+      12. Greedy Catcher: A unit test that catches exceptions and swallows the stack trace, sometimes logging the error but allowing the test to pass.
+      13. Sequencer: A unit test that depends on items in an unordered list appearing in the same order during assertions.
+      14. Enumerator: Unit tests where each test case method name is only an enumeration (e.g., test1, test2), making the test's intention unclear.
+      15. Excessive Setup: A test requiring a lot of setup work, making it difficult to ascertain what is being tested due to the setup "noise."
+      16. Line Hitter: Tests that merely hit the code without doing any output analysis, falsely appearing to cover everything.
+      17. The Liar: A test that passes in every scenario without validating any behavior, failing to discover any new bugs.
+     
+    Code:
     {code}
 
     Existing tests:
     {tests}
 
-   Return the list short (up to 200 symbols) and clear suggestions for code blocks to improve them, skip the recommendation if it is not Enumerator anti-pattern.
+   Return the list short (up to 200 symbols) and clear suggestions for code blocks to improve them, skip the recommendation if it is not anti-pattern from the given list.
+   Use only real path to test file from the input.
 
-  ---path to test file---
+  ---<path to test file>---
   {
     "suggestions": [{"text": "<suggestion text>", "code": "<block of code with anti-pattern>"],
     
@@ -55,15 +78,6 @@ export const enumeratorAgentPrompt: AgentPrompt = [
       {"file": "<full test content file>"}
     ]
   }
-  <block>
-  <suggestion>Suggestion</suggestion>
-  <code>
-    <!CDATA[<block of code with anti-pattern>]>
-  </code>
-  <file>
-    <!CDATA[<full test content file>]>
-  </file>
-  </block>
   ---end---
 
   Use Github Markdown format for the output with 3 backticks for code snippets and headings as needed
@@ -76,7 +90,7 @@ const coverageAgentPrompt: AgentPrompt = [
     'system',
     `Act as a experienced software developer. Analyze the test coverage report for the provided code which has uncovered lines, branches and functions, and identify parts of the code that are not covered by tests. 
     Write tests to cover the uncovered parts of the code. Only write a code in your answer. If no tests are needed, just say that the code is fully covered.
-    Use only real path to test from the input.
+    Use only real path to test file from the input.
 
     Path to code file:
     {path}
@@ -92,56 +106,17 @@ const coverageAgentPrompt: AgentPrompt = [
 
    Return the improved tests in the following format:
   ---<path to test>---
-  <test code>
+  {
+    "suggestions": [{"text": "<suggestion text>"],
+    
+    "files": [
+      {"file": "<full test content file>"}
+    ]
+  }
   ---end---
   Use Github Markdown format for the output with 3 backticks for code snippets and headings as needed
    `,
   ],
 ]
 
-const mutationAgentPrompt: AgentPrompt = [
-  [
-    'system',
-    `
-  Act as a software developer. Perform mutation testing on the provided codebase. Identify weak tests and suggest improvements or additional tests to catch mutations.
-
-  Code:
-  {code}
-
-  Tests:
-  {tests}
-
-  Mutation report:
-  {mutationReport}
-
-  Return the improved tests in the following format:
-  ---<path to test>---
-  <test code>
-  ---end---
-  Use Github Markdown format for the output with 3 backticks for code snippets and headings as needed
-  `,
-  ],
-]
-
-const linterAgentPrompt: AgentPrompt = [
-  [
-    'system',
-    `
-  Act as a software developer. Analyze the codebase for any linter issues. Suggest and implement improvements to fix the linter issues.
-
-  Code:
-  {code}
-
-  Linter issues:
-  {linterIssues}
-
-  Return the improved code with linter issues fixed in the following format:
-  ---<path to code file>---
-  <code>
-  ---end---
-  Use Github Markdown format for the output with 3 backticks for code snippets and headings as needed
-  `,
-  ],
-]
-
-export { testAgentPrompt, coverageAgentPrompt, mutationAgentPrompt, linterAgentPrompt, AgentPrompt }
+export { testAgentPrompt, coverageAgentPrompt, AgentPrompt }
