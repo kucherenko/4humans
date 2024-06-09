@@ -2,7 +2,7 @@ import { ArgumentsCamelCase, Argv } from 'yargs'
 import { logger } from '../logger'
 import degit from 'degit'
 import 'colors'
-import { bold, yellow } from 'picocolors'
+import { bold, green, yellow } from 'picocolors'
 import { existsSync, readFileSync, readJSONSync, writeFileSync } from 'fs-extra'
 import { parse } from 'junit2json'
 import { getTestsFiles } from '../utils/uncoverad'
@@ -12,6 +12,7 @@ import { AgentsManager } from '../agents-manager'
 import { runTests } from '../utils/run-tests'
 import { DummyAgent } from '../Agent/DummyAgent'
 import { diffChars } from 'diff'
+import * as process from 'node:process'
 
 interface GoArgv {
   repo?: string
@@ -52,7 +53,7 @@ export function builder(yargs: Argv) {
 }
 
 export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
-  const { repo = '', path, model } = argv
+  const { repo = '', path, model, skipCloning } = argv
 
   let pathInput: string = path as string
 
@@ -63,16 +64,27 @@ export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
       type: 'text',
     })
   }
-  if (!existsSync(pathInput as string)) {
+
+  if (!existsSync(pathInput as string) && !skipCloning) {
     await degit(repo).clone(pathInput as string)
     logger.success(`Repository ${bold(repo)} cloned to ${bold(path)}...`)
+  } else if (skipCloning && existsSync(pathInput as string)) {
+    logger.success(`Repository ${bold(repo)} already exists at ${bold(path)}...`)
+  } else if (!skipCloning && existsSync(pathInput as string)) {
+    logger.error(
+      `🚫 Repository ${bold(repo)} already exist at ${bold(path)}, try to use other folder or run the tool with --skip-cloning parameter...`,
+    )
+    process.exit(1)
   } else {
-    logger.success(`Repository ${bold(repo)} already cloned to ${bold(path)}...`)
+    logger.error(
+      `🚫Repository ${bold(repo)} not found, you should clone it, dont use --skip-cloning parameter check the name and try again...`,
+    )
+    process.exit(1)
   }
 
   process.chdir(pathInput as string)
 
-  logger.success('Start analysis...')
+  logger.success('🚀 Start analysis...')
 
   const config = existsSync('.4humans.json')
     ? readJSONSync('.4humans.json')
@@ -113,30 +125,34 @@ export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
 
   try {
     for (const [file, result] of Object.entries(results.getReport())) {
-      logger.info(`We have suggestions for file: ${file}`)
+      logger.box(`File: ${bold(file)}`)
+
       const diff = diffChars(result.old, result.new)
       diff.forEach((part) => {
         // green for additions, red for deletions
         const text = part.added ? part.value.bgGreen : part.removed ? part.value.bgRed : part.value
         process.stderr.write(text)
       })
+      logger.log('\n\n')
+      logger.info(green(`We applied the following changes to the: ${file}`))
+
       result.suggestions.forEach((suggestion: string) => {
-        logger.info(yellow(suggestion))
+        logger.log(`⭐️ ${yellow(suggestion)}`)
       })
-      const res = await logger.prompt('Do you want to apply the suggestions?', {
+      const res = await logger.prompt('🌵Do you want to apply the suggestions?', {
         type: 'confirm',
         initial: true,
       })
+
       if (res) {
         writeFileSync(file, result.new)
-        logger.success(`Suggestions applied, check ${bold(file)}...`)
+        logger.success(`✅ Suggestions applied, check ${bold(file)}...`)
       } else {
         writeFileSync(file, result.old)
-        logger.success(`Suggestions not applied, check ${bold(file)}...`)
+        logger.success(`🚫 Suggestions not applied, check ${bold(file)}...`)
       }
     }
   } catch (error) {
     logger.error(error)
   }
-  // logger.log('Results:', results)
 }
