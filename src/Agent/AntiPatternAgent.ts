@@ -18,8 +18,14 @@ export class AntiPatternAgent extends Agent {
 
     const chain = RunnableSequence.from([this.prompt, this.model, outputParser])
     const modelInput: EnumeratorAgentModelInput = {
-      code: input.code,
-      tests: Object.values(input.tests),
+      code: `// file name: ${input.path}\n${input.code}`,
+      tests: [
+        Object.entries(input.tests)
+          .map(([test, code]) => {
+            return `// file name: ${test}\n${code}`
+          })
+          .join('\n/* ----- file separator------- */\n'),
+      ],
     }
     const answer = await chain.invoke({
       ...modelInput,

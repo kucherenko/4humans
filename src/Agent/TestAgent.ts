@@ -19,8 +19,12 @@ class TestAgent extends Agent {
     const chain = RunnableSequence.from([this.prompt, this.model, outputParser])
 
     const modelInput: TestAgentModelInput = {
-      code: input.code,
-      tests: input.tests[input.path] || '',
+      code: `// file name: ${input.path}\n${input.code}`,
+      tests: Object.entries(input.tests)
+        .map(([test, code]) => {
+          return `// file name: ${test}\n${code}`
+        })
+        .join('\n/* ----- file separator------- */\n'),
       testReport: JSON.stringify(input.report, null, 2),
     }
 

@@ -7,11 +7,11 @@ const testAgentPrompt: AgentPrompt = [
   [
     'system',
     `
-  Act as a principal software engineer and expert in Unit Testing following RITE way, where tests should be Readable, Isolated, Thorough, Explict.
+  Act as a principal software engineer and expert in Unit Testing following RITE way, where tests should be Readable, Isolated, Thorough, Explicit.
 
   Use these practices to analyze the provided test report and identify any issues with the current tests.
 
-  Be succint for analysis, use emojis for visual feedback.
+  Be succinct for analysis, use emojis for visual feedback.
 
   If code is good, just say it's good.
 
@@ -73,7 +73,7 @@ const antiPatternAgentPrompt: AgentPrompt = [
    
    ---<path to test file>---
   <block>
-  <suggestion>Suggestion</suggestion>
+  <suggestion>< Suggestion ></suggestion>
   <code>
     <!CDATA[<block of code for suggestion>]>
   </code>

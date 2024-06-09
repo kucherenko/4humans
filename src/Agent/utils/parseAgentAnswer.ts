@@ -1,6 +1,5 @@
 import { AgentResult } from '../types'
 import { parseStringPromise } from 'xml2js'
-import { logger } from '../../logger'
 
 async function parseAgentAnswer(answer: string): Promise<AgentResult> {
   const result: AgentResult = {
@@ -24,7 +23,7 @@ async function parseAgentAnswer(answer: string): Promise<AgentResult> {
         result.suggestions.push(suggestion + '\n' + code)
         result.files.push([filePath, file])
       } catch (error) {
-        logger.error('Error parsing agent answer')
+        throw new Error('Error parsing agent answer')
       }
     }
   }
