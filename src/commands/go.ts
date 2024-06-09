@@ -6,11 +6,10 @@ import { existsSync, readFileSync, readJSONSync } from 'fs-extra'
 import { CoverageAgent, AntiPatternAgent, TestAgent } from '../Agent'
 import { parse } from 'junit2json'
 import { getTestsFiles } from '../utils/uncoverad'
-import { spawnSync } from 'node:child_process'
 import { AIModel, getAIModel } from '../utils/chatModels'
 import { FinalInputData } from '../types/final-input-data'
 import { AgentsManager } from '../agents-manager'
-import { writeResultsReport } from '../utils/reporter'
+import { runTests } from '../utils/run-tests'
 
 interface GoArgv {
   repo?: string
@@ -84,12 +83,7 @@ export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
         },
       }
 
-  spawnSync(config.install, {
-    shell: true,
-  })
-  const tests = spawnSync(config.test.command, {
-    shell: true,
-  })
+  const tests = runTests(config, { install: true })
 
   const report = existsSync(config.test.report) ? await parse(readFileSync(config.test.report, 'utf-8').toString()) : ''
   const coverageReport = existsSync(config.test.coverage) ? readJSONSync(config.test.coverage) : {}
@@ -113,12 +107,15 @@ export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
   const coverageAgent = new CoverageAgent(agentModel)
   const antiPatternAgent = new AntiPatternAgent(agentModel)
 
-  const agentManager = new AgentsManager(finalInputData)
+  const agentManager = new AgentsManager(finalInputData, config)
+
+  agentManager.init()
+
   agentManager.addAgent(testAgent)
   agentManager.addAgent(coverageAgent)
   agentManager.addAgent(antiPatternAgent)
 
   const results = await agentManager.run()
 
-  writeResultsReport(results)
+  logger.log('Results:', results)
 }
