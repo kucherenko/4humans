@@ -7,7 +7,6 @@ import { BaseChatModel } from '@langchain/core/language_models/chat_models'
 import { enumeratorAgentPrompt } from './prompts'
 
 export class EnumeratorAgent extends Agent {
-
   constructor(model: BaseChatModel) {
     super(model, enumeratorAgentPrompt)
   }

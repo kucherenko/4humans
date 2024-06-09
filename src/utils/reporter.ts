@@ -8,7 +8,7 @@ import { logger } from '../logger'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 // marked.setOptions({ renderer })
 
-export const writeResultsReport = (results: string[]) => {
+export const writeResultsReport = (results: Array<Record<string, string> | string>) => {
   // results.forEach((result) => logger.log(marked(result)))
   results.forEach((result) => logger.log(result))
 }
