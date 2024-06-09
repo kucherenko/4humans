@@ -41,4 +41,21 @@ export class State {
     this._suggestions[name] = this._suggestions[name] || []
     this._suggestions[name]?.push(suggestions)
   }
+
+  getReport() {
+    return Object.entries(this._files)
+      .filter(([file, versions]) => file && versions.length > 0 && versions[0] !== versions[versions.length - 1])
+      .reduce(
+        (acc, item) => {
+          const [file, versions] = item
+          acc[file] = {
+            old: versions[0] as string,
+            new: versions[versions.length - 1] as string,
+            suggestions: this._suggestions[file] || [],
+          }
+          return acc
+        },
+        {} as Record<string, { old: string; new: string; suggestions: string[] }>,
+      )
+  }
 }
