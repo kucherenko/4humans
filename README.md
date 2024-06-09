@@ -1,7 +1,3 @@
-Sure, here's a draft for your `README.md` file:
-
----
-
 # 4Humans
 
 4Humans is a tool designed to analyze the quality of unit tests and suggest improvements. It employs the Test && Commit || Revert (TCR) methodology, proposed by Kent Beck, to ensure high-quality code through continuous testing and committing.
