@@ -138,7 +138,7 @@ export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
 
   const agentModel = getAIModel(model)
 
-  const agentManager = new AgentsManager(agentModel, finalInputData, config, argv.retry as number)
+  const agentManager = new AgentsManager(finalInputData, config, argv.retry as number)
 
   agentManager.init()
 
