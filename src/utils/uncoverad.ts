@@ -24,7 +24,7 @@ export async function getTestsFiles(
 ): Promise<Record<string, string[]>> {
   const {
     path = process.cwd(),
-    include = ['**/*.{test,spec}.?(c|m)[jt]s?(x)'],
+    include = ['**/*.{test,spec}.?(c|m)[jt]s?(x)', 'test/**/*.?(c|m)[jt]s?(x)'],
     uncoveredOnly = false,
     ignore = [
       '**/node_modules/**',
