@@ -22,6 +22,7 @@ export class AgentsManager {
   constructor(
     private finalInputData: FinalInputData,
     private config: Config,
+    private retry: number = 0,
   ) {}
 
   init() {
@@ -47,13 +48,24 @@ export class AgentsManager {
 
     // go through each pair(file with tests) and run the agents
     const pairs = this.finalInputData?.files ? Object.entries(this.finalInputData?.files) : []
-    while (pairs.length) {
-      const pair = pairs.shift()
-      if (!pair) {
+
+    const tasks: [string, string[], Agent, number][] = []
+
+    for (const pair of pairs) {
+      for (const agent of this.agents) {
+        tasks.push([...pair, agent, 0])
+      }
+    }
+
+    while (tasks.length) {
+      const task = tasks.shift()
+      if (!task) {
         continue
       }
-      const [file, tests] = pair
+      const [file, tests, agent, retry] = task
+
       logger.info(`Processing file: ${file}`)
+
       const { test } = this.config
       const coverageReport = existsSync(test?.coverage as string) ? readJSONSync(test?.coverage as string) : {}
       const fileCoverage = coverageReport[file] || {}
@@ -69,28 +81,32 @@ export class AgentsManager {
         report: this.finalInputData.execution,
       }
 
-      for (const agent of this.agents) {
-        const result = await agent.process(input)
-        const { files, suggestions } = result
-        for (const [file, content] of Object.entries(files)) {
+      const result = await agent.process(input)
+
+      const { files, suggestions } = result
+
+      for (const [file, content] of Object.entries(files)) {
+        if (existsSync(file)) {
+          writeFileSync(file, content.toString())
+        }
+      }
+
+      const testsResult = runTests(this.config, { install: false })
+      if (testsResult.status) {
+        logger.error(testsResult.stderr.toString())
+        for (const [file] of Object.entries(files)) {
           if (existsSync(file)) {
-            writeFileSync(file, content.toString())
+            writeFileSync(file, this.state.getFinalFile(file))
           }
         }
-        const tests = runTests(this.config, { install: false })
-        if (tests.status) {
-          logger.error(tests.stderr.toString())
-          for (const [file] of Object.entries(files)) {
-            if (existsSync(file)) {
-              writeFileSync(file, this.state.getFinalFile(file))
-            }
-          }
-        } else {
-          for (const [file, content] of Object.entries(files)) {
-            if (existsSync(file)) {
-              this.state.setFile(file, content.toString())
-              suggestions.forEach((suggestion) => this.state.addSuggestions(file, suggestion))
-            }
+        if (Number(retry) < this.retry) {
+          tasks.push([file, tests, agent, Number(retry) + 1])
+        }
+      } else {
+        for (const [file, content] of Object.entries(files)) {
+          if (existsSync(file)) {
+            this.state.setFile(file, content.toString())
+            suggestions.forEach((suggestion: string) => this.state.addSuggestions(file, suggestion))
           }
         }
       }
