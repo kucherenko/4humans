@@ -3,9 +3,9 @@ import { FinalInputData } from './types/final-input-data'
 import { logger } from './logger'
 import { InputItem } from './types/input-item'
 import { State } from './state'
-import { AgentResult } from './Agent/types'
 import { existsSync, readJSONSync, writeFileSync } from 'fs-extra'
 import { runTests } from './utils/run-tests'
+import { gray, green, red, yellow } from 'picocolors'
 
 interface Config {
   install: string
@@ -41,10 +41,7 @@ export class AgentsManager {
   }
 
   async run() {
-    logger.log('Running agents...')
     logger.debug('Config:', this.config)
-
-    const results: Array<string | Record<string, string> | AgentResult> = []
 
     // go through each pair(file with tests) and run the agents
     const pairs = this.finalInputData?.files ? Object.entries(this.finalInputData?.files) : []
@@ -63,9 +60,6 @@ export class AgentsManager {
         continue
       }
       const [file, tests, agent, retry] = task
-
-      logger.info(`Processing file: ${file}`)
-
       const { test } = this.config
       const coverageReport = existsSync(test?.coverage as string) ? readJSONSync(test?.coverage as string) : {}
       const fileCoverage = coverageReport[file] || {}
@@ -85,16 +79,23 @@ export class AgentsManager {
 
       const { files, suggestions } = result
 
-      for (const [file, content] of Object.entries(files)) {
+      logger.info(
+        yellow(
+          `🥸 Agent ${agent.constructor.name} suggested changes for file(s): ${files.map(([file]) => file).join(', ')}`,
+        ),
+      )
+      for (const [file, content] of files) {
         if (existsSync(file)) {
-          writeFileSync(file, content.toString())
+          writeFileSync(file, content)
         }
       }
-
+      logger.info(yellow(`🧪🍀 Running tests after applying the suggestions...`))
       const testsResult = runTests(this.config, { install: false })
+      logger.info(gray('Tests result:'), testsResult.status ? red('🚫  error') : green('✅  ok'))
+
       if (testsResult.status) {
         logger.error(testsResult.stderr.toString())
-        for (const [file] of Object.entries(files)) {
+        for (const [file] of files) {
           if (existsSync(file)) {
             writeFileSync(file, this.state.getFinalFile(file))
           }
@@ -103,14 +104,14 @@ export class AgentsManager {
           tasks.push([file, tests, agent, Number(retry) + 1])
         }
       } else {
-        for (const [file, content] of Object.entries(files)) {
+        for (const [file, content] of files) {
           if (existsSync(file)) {
-            this.state.setFile(file, content.toString())
+            this.state.setFile(file, content)
             suggestions.forEach((suggestion: string) => this.state.addSuggestions(file, suggestion))
           }
         }
       }
     }
-    return results
+    return this.state
   }
 }

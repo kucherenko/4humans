@@ -23,7 +23,7 @@ export interface EnumeratorAgentModelInput {
 }
 
 export interface AgentResult {
-  files: Record<string, string>[]
+  files: [string, string][]
   suggestions: string[]
   status?: 'ok' | 'error'
 }

@@ -17,6 +17,9 @@ importers:
       '@langchain/openai':
         specifier: 0.1.2
         version: 0.1.2(langchain@0.2.5(handlebars@4.7.8)(ignore@5.3.1)(openai@4.49.1))
+      '@types/diff':
+        specifier: ^5.2.1
+        version: 5.2.1
       '@vercel/nft':
         specifier: ^0.27.2
         version: 0.27.2
@@ -1337,6 +1340,9 @@ packages:
 
   '@types/degit@2.8.6':
     resolution: {integrity: sha512-y0M7sqzsnHB6cvAeTCBPrCQNQiZe8U4qdzf8uBVmOWYap5MMTN/gB2iEqrIqFiYcsyvP74GnGD5tgsHttielFw==}
+
+  '@types/diff@5.2.1':
+    resolution: {integrity: sha512-uxpcuwWJGhe2AR1g8hD9F5OYGCqjqWnBUQFD8gMZsDbv8oPHzxJF6iMO6n8Tk0AdzlxoaaoQhOYlIg/PukVU8g==}
 
   '@types/estree@1.0.5':
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
@@ -6226,6 +6232,8 @@ snapshots:
     optional: true
 
   '@types/degit@2.8.6': {}
+
+  '@types/diff@5.2.1': {}
 
   '@types/estree@1.0.5': {}
 
