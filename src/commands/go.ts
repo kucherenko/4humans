@@ -114,14 +114,12 @@ export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
   try {
     for (const [file, result] of Object.entries(results.getReport())) {
       logger.info(`We have suggestions for file: ${file}`)
-      const diff = diffChars(result.old, result.new);
+      const diff = diffChars(result.old, result.new)
       diff.forEach((part) => {
         // green for additions, red for deletions
-        let text = part.added ? part.value.bgGreen :
-          part.removed ? part.value.bgRed :
-            part.value;
-        process.stderr.write(text);
-      });
+        const text = part.added ? part.value.bgGreen : part.removed ? part.value.bgRed : part.value
+        process.stderr.write(text)
+      })
       result.suggestions.forEach((suggestion: string) => {
         logger.info(yellow(suggestion))
       })
@@ -141,5 +139,4 @@ export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
     logger.error(error)
   }
   // logger.log('Results:', results)
-
 }

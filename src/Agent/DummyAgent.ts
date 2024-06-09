@@ -12,10 +12,10 @@ export class DummyAgent extends Agent {
   async process(input: InputItem): Promise<AgentResult> {
     return {
       files: Object.entries(input.tests).map(([test, code]) => {
-         return [test, code + ' \n// ' + Math.random()]
+        return [test, code + ' \n// ' + Math.random()]
       }),
       status: 'ok',
-      suggestions: ["Try to improve the code quality", "Add more tests"]
-    };
+      suggestions: ['Try to improve the code quality', 'Add more tests'],
+    }
   }
 }
