@@ -22,7 +22,7 @@ async function parseAgentAnswer(answer: string): Promise<AgentResult> {
         const file = xmlObject.block.file.trim()
 
         result.suggestions.push(suggestion + '\n' + code)
-        result.files.push({ filePath, file })
+        result.files.push([filePath, file])
       } catch (error) {
         logger.error('Error parsing agent answer')
       }
