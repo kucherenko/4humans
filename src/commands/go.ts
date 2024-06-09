@@ -54,7 +54,7 @@ export function builder(yargs: Argv) {
 export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
   const { repo = '', path, model } = argv
 
-  let pathInput = path
+  let pathInput: string = path as string
 
   if (!path) {
     const repoName = repo.split('/').pop()
