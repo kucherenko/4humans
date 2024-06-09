@@ -23,13 +23,13 @@ const testAgentPrompt: AgentPrompt = [
   Existing test:
   {tests}
 
-  Use only real path to test file from the input. Return analysis of tests strictly in the XML Schema:
+  Use only real path to test file from the input. Return analysis of tests strictly in the XML Schema, include block tags, XML must be valid:
    
    ---<path to test file>---
   <block>
   <suggestion>Suggestion</suggestion>
   <code>
-    <!CDATA[<block of code for suggestion>]>
+    <!CDATA[<code for suggestion>]>
   </code>
   <file>
     <!CDATA[<full test content file>]>
@@ -69,13 +69,13 @@ const antiPatternAgentPrompt: AgentPrompt = [
     {tests}
 
    Return the list short (up to 200 symbols) and clear suggestions for code blocks to improve them, skip the recommendation if it is not anti-pattern from the given list.
-   Use only real path to test file from the input. Return analysis of tests strictly in the XML Schema:
+   Use only real path to test file from the input. Return analysis of tests strictly in the XML Schema, include block tags, XML must be valid:
    
    ---<path to test file>---
   <block>
   <suggestion>Suggestion</suggestion>
   <code>
-    <!CDATA[<block of code for suggestion>]>
+    <!CDATA[<code for suggestion>]>
   </code>
   <file>
     <!CDATA[<full test content file>]>
@@ -102,13 +102,13 @@ const coverageAgentPrompt: AgentPrompt = [
     Coverage report:
     {coverageReport}
 
-   Use only real path to test file from the input. Return analysis of tests strictly in the XML Schema:
+   Use only real path to test file from the input. Return analysis of tests strictly in the XML Schema, include block tags, XML must be valid:
    
    ---<path to test file>---
   <block>
   <suggestion>Suggestion</suggestion>
   <code>
-    <!CDATA[<block of code for suggestion>]>
+    <!CDATA[<code for suggestion>]>
   </code>
   <file>
     <!CDATA[<full test content file>]>
