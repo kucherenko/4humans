@@ -118,3 +118,5 @@ dist
 bundle
 node_modules
 TODO
+logger-dogger./
+logger-dogger/

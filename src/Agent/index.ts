@@ -1,5 +1,3 @@
 export * from './CoverageAgent'
-export * from './EnumeratorAgent'
-export * from './LinterAgent'
-export * from './MutationAgent'
+export * from './AntiPatternAgent'
 export * from './TestAgent'
