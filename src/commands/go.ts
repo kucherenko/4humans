@@ -10,6 +10,7 @@ import { spawnSync } from 'node:child_process'
 import { AIModel, getAIModel } from '../utils/chatModels'
 import { FinalInputData } from '../types/final-input-data'
 import { AgentsManager } from '../agents-manager'
+import { writeResultsReport } from '../utils/reporter'
 
 interface GoArgv {
   repo?: string
@@ -121,7 +122,8 @@ export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
   // agentManager.addAgent(mutationAgent)
 
   const results = await agentManager.run()
-  results.forEach((reSult) => logger.log(reSult))
+
+  writeResultsReport(results)
 
   /**
    *

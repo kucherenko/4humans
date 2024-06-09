@@ -27,6 +27,7 @@ const testAgentPrompt: AgentPrompt = [
   ---<path to test>---
   <test code analysis>
   ---end---
+  Use Github Markdown format for the output with 3 backticks for code snippets and headings as needed
   `,
   ],
 ]
@@ -45,12 +46,15 @@ export const enumeratorAgentPrompt: AgentPrompt = [
     {tests}
 
    Return the list short (up to 200 symbols) and clear suggestions for code blocks to improve them, skip the recommendation if it is not Enumerator anti-pattern.
+
   ---recommendation---
   Suggestion:
   <suggestion to improve>
   Code:
   <block of code with anti-pattern>
   ---end---
+
+  Use Github Markdown format for the output with 3 backticks for code snippets and headings as needed
    `,
   ],
 ]
@@ -74,6 +78,7 @@ const coverageAgentPrompt: AgentPrompt = [
   ---<path to test>---
   <test code>
   ---end---
+  Use Github Markdown format for the output with 3 backticks for code snippets and headings as needed
    `,
   ],
 ]
@@ -97,6 +102,7 @@ const mutationAgentPrompt: AgentPrompt = [
   ---<path to test>---
   <test code>
   ---end---
+  Use Github Markdown format for the output with 3 backticks for code snippets and headings as needed
   `,
   ],
 ]
@@ -117,6 +123,7 @@ const linterAgentPrompt: AgentPrompt = [
   ---<path to code file>---
   <code>
   ---end---
+  Use Github Markdown format for the output with 3 backticks for code snippets and headings as needed
   `,
   ],
 ]

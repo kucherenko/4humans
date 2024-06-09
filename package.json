@@ -89,6 +89,8 @@
     "glob": "^10.4.1",
     "junit2json": "^3.1.10",
     "langchain": "0.2.5",
+    "marked": "^12.0.2",
+    "marked-terminal": "^7.0.0",
     "picocolors": "^1.0.1",
     "yargs": "^17.7.2"
   },

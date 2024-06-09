@@ -47,6 +47,12 @@ importers:
       langchain:
         specifier: 0.2.5
         version: 0.2.5(handlebars@4.7.8)(ignore@5.3.1)(openai@4.49.1)
+      marked:
+        specifier: ^12.0.2
+        version: 12.0.2
+      marked-terminal:
+        specifier: ^7.0.0
+        version: 7.0.0(marked@12.0.2)
       picocolors:
         specifier: ^1.0.1
         version: 1.0.1
