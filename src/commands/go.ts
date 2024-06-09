@@ -3,7 +3,7 @@ import { logger } from '../logger'
 import degit from 'degit'
 import { bold } from 'picocolors'
 import { existsSync, readFileSync, readJSONSync } from 'fs-extra'
-import { CoverageAgent, EnumeratorAgent /*, LinterAgent, MutationAgent, TestAgent*/, TestAgent } from '../Agent'
+import { CoverageAgent, AntiPatternAgent, TestAgent } from '../Agent'
 import { parse } from 'junit2json'
 import { getTestsFiles } from '../utils/uncoverad'
 import { spawnSync } from 'node:child_process'
@@ -111,54 +111,14 @@ export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
 
   const testAgent = new TestAgent(agentModel)
   const coverageAgent = new CoverageAgent(agentModel)
-  const enuAgent = new EnumeratorAgent(agentModel)
-  // const linterAgent = new LinterAgent(agentModel)
-  // const mutationAgent = new MutationAgent(agentModel)
+  const antiPatternAgent = new AntiPatternAgent(agentModel)
 
   const agentManager = new AgentsManager(finalInputData)
   agentManager.addAgent(testAgent)
   agentManager.addAgent(coverageAgent)
-  agentManager.addAgent(enuAgent)
-  // agentManager.addAgent(mutationAgent)
+  agentManager.addAgent(antiPatternAgent)
 
   const results = await agentManager.run()
 
   writeResultsReport(results)
-
-  /**
-   *
-   * {"code.ts": {
-   *   tests: [...],
-   *   coverage: {...},
-   *   mutation: {...}
-   * }}
-   *
-   * Data -> Agent -> Orchestrator -> Report (files: {"path": "code", issues: []}) -> Html
-   *
-   *
-   *
-   * class CovAgent implements Agent{
-   *
-   *   constructor(private model) {}
-   *
-   *   process(input: CovArentInput) {
-   *
-   *   }
-   * }
-   *
-   * test report
-   * uncovered code
-   * code tree
-   * mutation testing - out of scope for MVP
-   * linter issues
-   *
-   * code not included in tests, but covered -> indirect test
-   *
-   * TestAgent
-   * CoverageAgent
-   * MutationAgent
-   * LinterAgent
-   *
-   *
-   */
 }
