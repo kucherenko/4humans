@@ -10,9 +10,10 @@ import { AIModel, getAIModel } from '../utils/chatModels'
 import { FinalInputData } from '../types/final-input-data'
 import { AgentsManager } from '../agents-manager'
 import { runTests } from '../utils/run-tests'
-import { DummyAgent } from '../Agent/DummyAgent'
+// import { DummyAgent } from '../Agent/DummyAgent'
 import { diffChars } from 'diff'
 import * as process from 'node:process'
+import { AntiPatternAgent, CoverageAgent, TestAgent } from '../Agent'
 
 interface GoArgv {
   repo?: string
@@ -119,7 +120,10 @@ export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
 
   agentManager.init()
 
-  agentManager.addAgent(new DummyAgent(agentModel))
+  // agentManager.addAgent(new DummyAgent(agentModel))
+  agentManager.addAgent(new CoverageAgent(agentModel))
+  agentManager.addAgent(new AntiPatternAgent(agentModel))
+  agentManager.addAgent(new TestAgent(agentModel))
 
   const results = await agentManager.run()
 

@@ -1,17 +1,19 @@
-import { Agent } from './Agent'
-import { InputItem } from '../types/input-item'
 import { StringOutputParser } from '@langchain/core/output_parsers'
 import { RunnableSequence } from '@langchain/core/runnables'
-import { EnumeratorAgentModelInput } from './types'
 import { BaseChatModel } from '@langchain/core/language_models/chat_models'
-import { enumeratorAgentPrompt } from './prompts'
+
+import { Agent } from './Agent'
+import { InputItem } from '../types/input-item'
+import { AgentResult, EnumeratorAgentModelInput } from './types'
+import { antiPatternAgentPrompt } from './prompts'
+import { parseAgentAnswer } from './utils/parseAgentAnswer'
 
 export class AntiPatternAgent extends Agent {
   constructor(model: BaseChatModel) {
-    super(model, enumeratorAgentPrompt)
+    super(model, antiPatternAgentPrompt)
   }
 
-  async process(input: InputItem): Promise<string> {
+  async process(input: InputItem): Promise<AgentResult> {
     const outputParser = new StringOutputParser({})
 
     const chain = RunnableSequence.from([this.prompt, this.model, outputParser])
@@ -19,8 +21,10 @@ export class AntiPatternAgent extends Agent {
       code: input.code,
       tests: Object.values(input.tests),
     }
-    return chain.invoke({
+    const answer = await chain.invoke({
       ...modelInput,
     })
+
+    return parseAgentAnswer(answer)
   }
 }

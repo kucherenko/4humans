@@ -5,25 +5,30 @@ import { RunnableSequence } from '@langchain/core/runnables'
 import { Agent } from './Agent'
 import { testAgentPrompt } from './prompts'
 import { InputItem } from '../types/input-item'
-import { TestAgentModelInput } from 'src/Agent/types'
+import { AgentResult, TestAgentModelInput } from 'src/Agent/types'
+import { parseAgentAnswer } from './utils/parseAgentAnswer'
 
 class TestAgent extends Agent {
   constructor(model: BaseChatModel) {
     super(model, testAgentPrompt)
   }
 
-  async process(_input: InputItem): Promise<string> {
+  async process(input: InputItem): Promise<AgentResult> {
     const outputParser = new StringOutputParser({})
 
     const chain = RunnableSequence.from([this.prompt, this.model, outputParser])
 
     const modelInput: TestAgentModelInput = {
-      code: _input.code,
-      tests: _input.tests[_input.path] || '',
-      testReport: JSON.stringify(_input.report, null, 2),
+      code: input.code,
+      tests: input.tests[input.path] || '',
+      testReport: JSON.stringify(input.report, null, 2),
     }
 
-    return chain.invoke(modelInput)
+    const answer = await chain.invoke({
+      ...modelInput,
+    })
+
+    return parseAgentAnswer(answer)
   }
 }
 
