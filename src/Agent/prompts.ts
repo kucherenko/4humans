@@ -23,6 +23,7 @@ const testAgentPrompt: AgentPrompt = [
   Existing test:
   {tests}
 
+
   Use only real path to test file from the input. Return analysis of tests strictly in the following format, don't add any other text around the block:
  
 
@@ -35,6 +36,7 @@ const testAgentPrompt: AgentPrompt = [
 ---end---
   
 `,
+
   ],
 ]
 
@@ -67,6 +69,7 @@ const antiPatternAgentPrompt: AgentPrompt = [
     {tests}
 
    Return the list short (up to 200 symbols) and clear suggestions for code blocks to improve them, skip the recommendation if it is not anti-pattern from the given list.
+
    The code block and suggestion should be connected to existing files.
    Use only real path to test file from the input. Return analysis of tests strictly in the following format, don't add any other text around the blocks:
    
@@ -78,8 +81,6 @@ const antiPatternAgentPrompt: AgentPrompt = [
 ---suggestion:<path to test file>---
 <description of fixed issue>   
 ---end---
-
-
    `,
   ],
 ]
@@ -99,6 +100,7 @@ const coverageAgentPrompt: AgentPrompt = [
 
     Coverage report:
     {coverageReport}
+
 
    Use only real path to test file from the input. Return improved files and description of issues fixed in improved files, the result should be in following format, 
    don't add any other text around the block:
