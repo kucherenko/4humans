@@ -13,15 +13,15 @@ class TestAgent extends Agent {
     super(model, testAgentPrompt)
   }
 
-  async process(_input: InputItem): Promise<AgentResult> {
+  async process(input: InputItem): Promise<AgentResult> {
     const outputParser = new StringOutputParser({})
 
     const chain = RunnableSequence.from([this.prompt, this.model, outputParser])
 
     const modelInput: TestAgentModelInput = {
-      code: _input.code,
-      tests: _input.tests[_input.path] || '',
-      testReport: JSON.stringify(_input.report, null, 2),
+      code: input.code,
+      tests: input.tests[input.path] || '',
+      testReport: JSON.stringify(input.report, null, 2),
     }
 
     const answer = await chain.invoke({
