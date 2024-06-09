@@ -3,17 +3,15 @@ import { StringOutputParser } from '@langchain/core/output_parsers'
 import { RunnableSequence } from '@langchain/core/runnables'
 
 import { Agent } from './Agent'
-import { coverageAgentPrompt } from './prompts'
-import { AgentResult, CoverageAgentModelInput } from './types'
+import { fixErrorAgentPrompt } from './prompts'
+import { AgentResult, FixErrorAgentModelInput } from './types'
 import { InputItem } from '../types/input-item'
-import { describeCoverageReport } from '../utils/uncoverad'
-import { Coverage } from '../types/coverage'
 import { extractAgentResult } from '../utils/parser'
 import { logger } from '../logger'
 
-class CoverageAgent extends Agent {
+export class FixErrorAgent extends Agent {
   constructor(model: BaseChatModel) {
-    super(model, coverageAgentPrompt)
+    super(model, fixErrorAgentPrompt)
   }
 
   async process(input: InputItem): Promise<AgentResult> {
@@ -21,14 +19,14 @@ class CoverageAgent extends Agent {
 
     const chain = RunnableSequence.from([this.prompt, this.model, outputParser])
 
-    const modelInput: CoverageAgentModelInput = {
+    const modelInput: FixErrorAgentModelInput = {
       code: `// file name: ${input.path}\n${input.code}`,
       tests: Object.entries(input.tests)
         .map(([test, code]) => {
           return `// file name: ${test}\n${code}`
         })
         .join('\n/* ---file separator--- */\n'),
-      coverageReport: JSON.stringify(describeCoverageReport(input.coverage as Coverage)),
+      error: input.error as string,
     }
 
     const answer = await chain.invoke({
@@ -41,5 +39,3 @@ class CoverageAgent extends Agent {
     return result
   }
 }
-
-export { CoverageAgent }

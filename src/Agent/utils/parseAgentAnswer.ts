@@ -16,11 +16,11 @@ async function parseAgentAnswer(answer: string): Promise<AgentResult> {
 
       try {
         const xmlObject = await parseStringPromise(codeBlock, { trim: true, explicitArray: false })
-        const suggestion = xmlObject.block.suggestion
-        const code = xmlObject.block.code.trim()
+        // const suggestion = xmlObject.block.suggestion
+        // const code = xmlObject.block.code.trim()
         const file = xmlObject.block.file.trim()
 
-        result.suggestions.push(suggestion + '\n' + code)
+        // result.suggestions.push(suggestion + '\n' + code)
         result.files.push([filePath, file])
       } catch (error) {
         throw new Error('Error parsing agent answer')
