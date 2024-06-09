@@ -20,6 +20,8 @@ interface GoArgv {
   path?: string
   skipCloning?: boolean
   model?: AIModel
+  save?: boolean
+  retry?: number
 }
 
 export const command = 'go <repo>'
@@ -50,6 +52,16 @@ export function builder(yargs: Argv) {
       type: 'boolean',
       default: false,
       describe: 'Skip cloning the repository.',
+    })
+    .option('save', {
+      default: false,
+      type: 'boolean',
+      describe: 'Save the result file.',
+    })
+    .option('retry', {
+      default: 0,
+      type: 'number',
+      describe: 'Number of retries.',
     })
 }
 
@@ -114,9 +126,20 @@ export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
     errors: tests.status ? tests.stderr.toString() : '',
   }
 
+  if (Object.entries(finalInputData.files).length === 0) {
+    logger.error('🚫 No tests found, check your configuration...')
+    process.exit(1)
+  }
+
+  if (tests.status) {
+    logger.error(tests)
+    logger.error('🚫 Tests failed, prepare your project before start improving, check the logs...')
+    process.exit(1)
+  }
+
   const agentModel = getAIModel(model)
 
-  const agentManager = new AgentsManager(finalInputData, config)
+  const agentManager = new AgentsManager(finalInputData, config, argv.retry as number)
 
   agentManager.init()
 
@@ -155,6 +178,11 @@ export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
         writeFileSync(file, result.old)
         logger.success(`🚫 Suggestions not applied, check ${bold(file)}...`)
       }
+    }
+    if (argv.save) {
+      logger.success('📝 Saving the result file...')
+      writeFileSync('4humans-result.json', JSON.stringify(results.getReport(), null, 2))
+      logger.success('📝 4humans-result.json file saved.')
     }
   } catch (error) {
     logger.error(error)

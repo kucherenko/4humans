@@ -75,40 +75,58 @@ export class AgentsManager {
         report: this.finalInputData.execution,
       }
 
-      const result = await agent.process(input)
+      try {
+        const result = await agent.process(input)
 
-      const { files, suggestions } = result
+        const { files, suggestions } = result
 
-      logger.info(
-        yellow(
-          `🥸 Agent ${agent.constructor.name} suggested changes for file(s): ${files.map(([file]) => file).join(', ')}`,
-        ),
-      )
-      for (const [file, content] of files) {
-        if (existsSync(file)) {
-          writeFileSync(file, content)
-        }
-      }
-      logger.info(yellow(`🧪🍀 Running tests after applying the suggestions...`))
-      const testsResult = runTests(this.config, { install: false })
-      logger.info(gray('Tests result:'), testsResult.status ? red('🚫  error') : green('✅  ok'))
+        logger.log(result)
 
-      if (testsResult.status) {
-        logger.error(testsResult.stderr.toString())
-        for (const [file] of files) {
-          if (existsSync(file)) {
-            writeFileSync(file, this.state.getFinalFile(file))
+        if (files.length > 0 || suggestions.length > 0) {
+          logger.info(
+            yellow(
+              `🥸 Agent ${agent.constructor.name} suggested changes for file(s): ${files.map(([file]) => file).join(', ')}`,
+            ),
+          )
+        } else {
+          logger.debug(yellow(`🥸 Agent ${agent.constructor.name} didn't suggest any changes, will try again...`))
+          if (Number(retry) <= this.retry) {
+            tasks.push([file, tests, agent, Number(retry) + 1])
           }
+          continue
         }
-        if (Number(retry) < this.retry) {
-          tasks.push([file, tests, agent, Number(retry) + 1])
-        }
-      } else {
+
         for (const [file, content] of files) {
           if (existsSync(file)) {
-            this.state.setFile(file, content)
-            suggestions.forEach((suggestion: string) => this.state.addSuggestions(file, suggestion))
+            writeFileSync(file, content)
           }
+        }
+        logger.info(yellow(`🧪🍀 Running tests after applying the suggestions...`))
+        const testsResult = runTests(this.config, { install: false })
+        logger.info(gray('Tests result:'), testsResult.status ? red('🚫  error') : green('✅  ok'))
+
+        if (testsResult.status) {
+          logger.error(testsResult.stderr.toString())
+          for (const [file] of files) {
+            if (existsSync(file)) {
+              writeFileSync(file, this.state.getFinalFile(file))
+            }
+          }
+          if (Number(retry) <= this.retry) {
+            tasks.push([file, tests, agent, Number(retry) + 1])
+          }
+        } else {
+          for (const [file, content] of files) {
+            if (existsSync(file)) {
+              this.state.setFile(file, content)
+              suggestions.forEach((suggestion: string) => this.state.addSuggestions(file, suggestion))
+            }
+          }
+        }
+      } catch (error) {
+        logger.error(error)
+        if (Number(retry) <= this.retry) {
+          tasks.push([file, tests, agent, Number(retry) + 1])
         }
       }
     }
