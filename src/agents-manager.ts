@@ -5,6 +5,7 @@ import { InputItem } from './types/input-item'
 import { State } from './state'
 import { existsSync, readJSONSync, writeFileSync } from 'fs-extra'
 import { runTests } from './utils/run-tests'
+import { gray, green, red, yellow } from 'picocolors'
 
 interface Config {
   install: string
@@ -40,7 +41,6 @@ export class AgentsManager {
   }
 
   async run() {
-    logger.log('Running agents...')
     logger.debug('Config:', this.config)
 
     // go through each pair(file with tests) and run the agents
@@ -60,9 +60,6 @@ export class AgentsManager {
         continue
       }
       const [file, tests, agent, retry] = task
-
-      logger.info(`Processing file: ${file}`, retry)
-
       const { test } = this.config
       const coverageReport = existsSync(test?.coverage as string) ? readJSONSync(test?.coverage as string) : {}
       const fileCoverage = coverageReport[file] || {}
@@ -82,15 +79,20 @@ export class AgentsManager {
 
       const { files, suggestions } = result
 
+      logger.info(
+        yellow(
+          `🥸 Agent ${agent.constructor.name} suggested changes for file(s): ${files.map(([file]) => file).join(', ')}`,
+        ),
+      )
       for (const [file, content] of files) {
         if (existsSync(file)) {
-          logger.info(`Writing file: ${file}`)
           writeFileSync(file, content)
         }
       }
-
+      logger.info(yellow(`🧪🍀 Running tests after applying the suggestions...`))
       const testsResult = runTests(this.config, { install: false })
-      logger.log('Tests result:', testsResult.status)
+      logger.info(gray('Tests result:'), testsResult.status ? red('🚫  error') : green('✅  ok'))
+
       if (testsResult.status) {
         logger.error(testsResult.stderr.toString())
         for (const [file] of files) {
