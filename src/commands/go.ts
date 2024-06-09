@@ -1,15 +1,17 @@
 import { ArgumentsCamelCase, Argv } from 'yargs'
 import { logger } from '../logger'
 import degit from 'degit'
-import { bold } from 'picocolors'
-import { existsSync, readFileSync, readJSONSync } from 'fs-extra'
-import { CoverageAgent, AntiPatternAgent, TestAgent } from '../Agent'
+import 'colors'
+import { bold, yellow } from 'picocolors'
+import { existsSync, readFileSync, readJSONSync, writeFileSync } from 'fs-extra'
 import { parse } from 'junit2json'
 import { getTestsFiles } from '../utils/uncoverad'
 import { AIModel, getAIModel } from '../utils/chatModels'
 import { FinalInputData } from '../types/final-input-data'
 import { AgentsManager } from '../agents-manager'
 import { runTests } from '../utils/run-tests'
+import { DummyAgent } from '../Agent/DummyAgent'
+import { diffChars } from 'diff'
 
 interface GoArgv {
   repo?: string
@@ -52,7 +54,7 @@ export function builder(yargs: Argv) {
 export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
   const { repo = '', path, model } = argv
 
-  let pathInput = path
+  let pathInput: string = path as string
 
   if (!path) {
     const repoName = repo.split('/').pop()
@@ -99,23 +101,42 @@ export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
     errors: tests.status ? tests.stderr.toString() : '',
   }
 
-  logger.log(finalInputData)
-
   const agentModel = getAIModel(model)
-
-  const testAgent = new TestAgent(agentModel)
-  const coverageAgent = new CoverageAgent(agentModel)
-  const antiPatternAgent = new AntiPatternAgent(agentModel)
 
   const agentManager = new AgentsManager(finalInputData, config)
 
   agentManager.init()
 
-  agentManager.addAgent(testAgent)
-  agentManager.addAgent(coverageAgent)
-  agentManager.addAgent(antiPatternAgent)
+  agentManager.addAgent(new DummyAgent(agentModel))
 
   const results = await agentManager.run()
 
-  logger.log('Results:', results)
+  try {
+    for (const [file, result] of Object.entries(results.getReport())) {
+      logger.info(`We have suggestions for file: ${file}`)
+      const diff = diffChars(result.old, result.new)
+      diff.forEach((part) => {
+        // green for additions, red for deletions
+        const text = part.added ? part.value.bgGreen : part.removed ? part.value.bgRed : part.value
+        process.stderr.write(text)
+      })
+      result.suggestions.forEach((suggestion: string) => {
+        logger.info(yellow(suggestion))
+      })
+      const res = await logger.prompt('Do you want to apply the suggestions?', {
+        type: 'confirm',
+        initial: true,
+      })
+      if (res) {
+        writeFileSync(file, result.new)
+        logger.success(`Suggestions applied, check ${bold(file)}...`)
+      } else {
+        writeFileSync(file, result.old)
+        logger.success(`Suggestions not applied, check ${bold(file)}...`)
+      }
+    }
+  } catch (error) {
+    logger.error(error)
+  }
+  // logger.log('Results:', results)
 }
