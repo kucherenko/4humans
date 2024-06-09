@@ -43,6 +43,12 @@ interface LinterAgentInput extends AgentInput {
   // Additional properties for LinterAgent
 }
 
+export interface AgentResult {
+  files: Record<string, string>[]
+  suggestions: string[]
+  status?: 'ok' | 'error'
+}
+
 export {
   AgentInput,
   TestAgentInput,

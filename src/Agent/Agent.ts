@@ -1,7 +1,7 @@
 import { BaseChatModel } from '@langchain/core/language_models/chat_models'
 import { ChatPromptTemplate } from '@langchain/core/prompts'
 
-import { AgentInput } from './types'
+import { AgentInput, AgentResult } from './types'
 import { AgentPrompt } from './prompts'
 import { InputItem } from '../types/input-item'
 
@@ -16,7 +16,7 @@ abstract class Agent {
     this.input = input
   }
 
-  abstract process(input: InputItem): Promise<string | Record<string, string>>
+  abstract process(input: InputItem): Promise<AgentResult>
 }
 
 export { Agent }

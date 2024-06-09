@@ -47,11 +47,23 @@ export const enumeratorAgentPrompt: AgentPrompt = [
 
    Return the list short (up to 200 symbols) and clear suggestions for code blocks to improve them, skip the recommendation if it is not Enumerator anti-pattern.
 
-  ---recommendation---
-  Suggestion:
-  <suggestion to improve>
-  Code:
-  <block of code with anti-pattern>
+  ---path to test file---
+  {
+    "suggestions": [{"text": "<suggestion text>", "code": "<block of code with anti-pattern>"],
+    
+    "files": [
+      {"file": "<full test content file>"}
+    ]
+  }
+  <block>
+  <suggestion>Suggestion</suggestion>
+  <code>
+    <!CDATA[<block of code with anti-pattern>]>
+  </code>
+  <file>
+    <!CDATA[<full test content file>]>
+  </file>
+  </block>
   ---end---
 
   Use Github Markdown format for the output with 3 backticks for code snippets and headings as needed
