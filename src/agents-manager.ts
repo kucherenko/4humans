@@ -32,7 +32,6 @@ export class AgentsManager {
         coverage: fileCoverage,
         report: this.finalInputData.execution,
       }
-      logger.debug(input)
       for (const agent of this.agents) {
         results.push(await agent.process(input))
       }
