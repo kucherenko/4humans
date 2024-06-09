@@ -82,8 +82,6 @@ export class AgentsManager {
 
         const { files, suggestions } = result
 
-        logger.log(result)
-
         if (files.length > 0 || suggestions.length > 0) {
           logger.info(
             yellow(
@@ -107,7 +105,6 @@ export class AgentsManager {
         const testsResult = runTests(this.config, { install: false })
         logger.info(gray('Tests result:'), testsResult.status ? red('🚫  error') : green('✅  ok'))
         if (testsResult.status) {
-          logger.error(testsResult.stderr.toString())
           for (const [file] of files) {
             if (existsSync(file)) {
               writeFileSync(file, this.state.getFinalFile(file))

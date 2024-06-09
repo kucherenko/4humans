@@ -14,8 +14,7 @@ export class DummyAgent extends Agent {
       files: Object.entries(input.tests).map(([test, code]) => {
         return [test, code + ' \n// ' + Math.random()]
       }),
-      status: 'ok',
-      suggestions: ['Try to improve the code quality', 'Add more tests'],
+      suggestions: [['Try to improve the code quality', 'Add more tests']],
     }
   }
 }

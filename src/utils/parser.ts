@@ -1,5 +1,4 @@
 import { AgentResult } from '../Agent/types'
-import { logger } from '../logger'
 
 type TestBlock = {
   path: string
@@ -41,8 +40,6 @@ export function extractTestBlocks(input: string): TestBlock[] {
 
 export const extractAgentResult = (input: string): AgentResult => {
   const blocks = extractTestBlocks(input)
-
-  logger.log(blocks)
 
   const suggestions: [string, string][] = []
   const files: [string, string][] = []

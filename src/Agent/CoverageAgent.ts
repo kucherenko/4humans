@@ -9,7 +9,6 @@ import { InputItem } from '../types/input-item'
 import { describeCoverageReport } from '../utils/uncoverad'
 import { Coverage } from '../types/coverage'
 import { extractAgentResult } from '../utils/parser'
-import { logger } from '../logger'
 
 class CoverageAgent extends Agent {
   constructor(model: BaseChatModel) {
@@ -35,10 +34,7 @@ class CoverageAgent extends Agent {
       ...modelInput,
     })
 
-    logger.log(answer)
-    const result = extractAgentResult(answer)
-    logger.log(result)
-    return result
+    return extractAgentResult(answer)
   }
 }
 
