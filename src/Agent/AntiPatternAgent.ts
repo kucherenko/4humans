@@ -6,7 +6,7 @@ import { Agent } from './Agent'
 import { InputItem } from '../types/input-item'
 import { AgentResult, EnumeratorAgentModelInput } from './types'
 import { antiPatternAgentPrompt } from './prompts'
-import { parseAgentAnswer } from './utils/parseAgentAnswer'
+import { extractAgentResult } from '../utils/parser'
 
 export class AntiPatternAgent extends Agent {
   constructor(model: BaseChatModel) {
@@ -31,6 +31,6 @@ export class AntiPatternAgent extends Agent {
       ...modelInput,
     })
 
-    return parseAgentAnswer(answer)
+    return extractAgentResult(answer)
   }
 }

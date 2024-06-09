@@ -62,7 +62,9 @@ export class AgentsManager {
       const [file, tests, agent, retry] = task
       const { test } = this.config
       const coverageReport = existsSync(test?.coverage as string) ? readJSONSync(test?.coverage as string) : {}
-      const fileCoverage = coverageReport[file] || {}
+
+      const fileCoverage =
+        Object.entries(coverageReport).length > 0 ? coverageReport[file] : this.finalInputData.coverage[file]
 
       const input: InputItem = {
         path: file,
@@ -104,7 +106,6 @@ export class AgentsManager {
         logger.info(yellow(`🧪🍀 Running tests after applying the suggestions...`))
         const testsResult = runTests(this.config, { install: false })
         logger.info(gray('Tests result:'), testsResult.status ? red('🚫  error') : green('✅  ok'))
-
         if (testsResult.status) {
           logger.error(testsResult.stderr.toString())
           for (const [file] of files) {
@@ -119,7 +120,7 @@ export class AgentsManager {
           for (const [file, content] of files) {
             if (existsSync(file)) {
               this.state.setFile(file, content)
-              suggestions.forEach((suggestion: string) => this.state.addSuggestions(file, suggestion))
+              suggestions.forEach(([path, suggestion]: [string, string]) => this.state.addSuggestions(path, suggestion))
             }
           }
         }

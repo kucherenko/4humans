@@ -6,7 +6,7 @@ import { Agent } from './Agent'
 import { testAgentPrompt } from './prompts'
 import { InputItem } from '../types/input-item'
 import { AgentResult, TestAgentModelInput } from 'src/Agent/types'
-import { parseAgentAnswer } from './utils/parseAgentAnswer'
+import { extractAgentResult } from '../utils/parser'
 
 class TestAgent extends Agent {
   constructor(model: BaseChatModel) {
@@ -32,7 +32,7 @@ class TestAgent extends Agent {
       ...modelInput,
     })
 
-    return parseAgentAnswer(answer)
+    return extractAgentResult(answer)
   }
 }
 

@@ -17,6 +17,12 @@ interface CoverageAgentModelInput {
   coverageReport: string
 }
 
+export interface FixErrorAgentModelInput {
+  code: string
+  tests: string
+  error: string
+}
+
 export interface EnumeratorAgentModelInput {
   code: string
   tests: string[]
@@ -24,8 +30,7 @@ export interface EnumeratorAgentModelInput {
 
 export interface AgentResult {
   files: [string, string][]
-  suggestions: string[]
-  status?: 'ok' | 'error'
+  suggestions: [string, string][]
 }
 
 export { AgentInput, TestAgentModelInput, CoverageAgentModelInput, RepoSource }

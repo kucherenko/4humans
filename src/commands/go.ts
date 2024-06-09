@@ -10,7 +10,6 @@ import { AIModel, getAIModel } from '../utils/chatModels'
 import { FinalInputData } from '../types/final-input-data'
 import { AgentsManager } from '../agents-manager'
 import { runTests } from '../utils/run-tests'
-// import { DummyAgent } from '../Agent/DummyAgent'
 import { diffChars } from 'diff'
 import * as process from 'node:process'
 import { AntiPatternAgent, CoverageAgent, TestAgent } from '../Agent'
@@ -90,7 +89,7 @@ export async function handler(argv: ArgumentsCamelCase<GoArgv>) {
     process.exit(1)
   } else {
     logger.error(
-      `🚫Repository ${bold(repo)} not found, you should clone it, dont use --skip-cloning parameter check the name and try again...`,
+      `🚫 Repository ${bold(repo)} not found, you should clone it, dont use --skip-cloning parameter check the name and try again...`,
     )
     process.exit(1)
   }

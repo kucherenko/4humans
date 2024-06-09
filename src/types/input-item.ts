@@ -6,4 +6,5 @@ export interface InputItem {
   tests: Record<string, string>
   coverage: object
   report: TestSuites | TestSuite | '' | null | undefined
+  error?: string
 }
