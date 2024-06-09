@@ -24,7 +24,7 @@ async function parseAgentAnswer(answer: string): Promise<AgentResult> {
         result.suggestions.push(suggestion + '\n' + code)
         result.files.push([filePath, file])
       } catch (error) {
-        logger.error('Error parsing agent answer')
+        logger.error('🚫 Error parsing agent answer')
       }
     }
   }
