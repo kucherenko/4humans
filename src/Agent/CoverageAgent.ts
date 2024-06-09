@@ -21,8 +21,12 @@ class CoverageAgent extends Agent {
     const chain = RunnableSequence.from([this.prompt, this.model, outputParser])
 
     const modelInput: CoverageAgentModelInput = {
-      code: input.code,
-      tests: JSON.stringify(input.tests),
+      code: `// file name: ${input.path}\n${input.code}`,
+      tests: Object.entries(input.tests)
+        .map(([test, code]) => {
+          return `// file name: ${test}\n${code}`
+        })
+        .join('\n/* ----- file separator------- */\n'),
       coverageReport: JSON.stringify(describeCoverageReport(input.coverage as Coverage)),
     }
 
